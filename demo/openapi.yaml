@@ -1,77 +1,145 @@
 openapi: 3.0.0
 servers:
-  - url: //petstore.swagger.io/v2
+  - url: https://archon-api.aggso.com
     description: Default server
-  - url: //petstore.swagger.io/sandbox
-    description: Sandbox server
+  # - url: //petstore.swagger.io/sandbox
+  #   description: Sandbox server
 info:
-  description: |
-    This is a sample server Petstore server.
-    You can find out more about Swagger at
-    [http://swagger.io](http://swagger.io) or on [irc.freenode.net, #swagger](http://swagger.io/irc/).
-    For this sample, you can use the api key `special-key` to test the authorization filters.
-
-    # Introduction
-    This API is documented in **OpenAPI format** and is based on
-    [Petstore sample](http://petstore.swagger.io/) provided by [swagger.io](http://swagger.io) team.
-    It was **extended** to illustrate features of [generator-openapi-repo](https://github.com/Rebilly/generator-openapi-repo)
-    tool and [ReDoc](https://github.com/Rebilly/ReDoc) documentation. In addition to standard
-    OpenAPI syntax we use a few [vendor extensions](https://github.com/Rebilly/ReDoc/blob/master/docs/redoc-vendor-extensions.md).
-    
-    # OpenAPI Specification
-    This API is documented in **OpenAPI format** and is based on
-    [Petstore sample](http://petstore.swagger.io/) provided by [swagger.io](http://swagger.io) team.
-    It was **extended** to illustrate features of [generator-openapi-repo](https://github.com/Rebilly/generator-openapi-repo)
-    tool and [ReDoc](https://github.com/Rebilly/ReDoc) documentation. In addition to standard
-    OpenAPI syntax we use a few [vendor extensions](https://github.com/Rebilly/ReDoc/blob/master/docs/redoc-vendor-extensions.md).
-    
-    # Cross-Origin Resource Sharing
-    This API features Cross-Origin Resource Sharing (CORS) implemented in compliance with  [W3C spec](https://www.w3.org/TR/cors/).
-    And that allows cross-domain communication from the browser.
-    All responses have a wildcard same-origin which makes them completely public and accessible to everyone, including any code on any site.
-
-    # Authentication
-
-    Petstore offers two forms of authentication:
-      - API Key
-      - OAuth2
-    OAuth2 - an open protocol to allow secure authorization in a simple
-    and standard method from web, mobile and desktop applications.
-
-    <security-definitions /> 
-
-  version: 1.0.0
-  title: Swagger Petstore
-  termsOfService: 'http://swagger.io/terms/'
-  contact:
-    name: API Support
-    email: apiteam@swagger.io
-    url: https://github.com/Rebilly/ReDoc
-  x-logo:
-    url: 'https://rebilly.github.io/ReDoc/petstore-logo.png'
-    altText: Petstore logo
-  license:
-    name: Apache 2.0
-    url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
-externalDocs:
-  description: Find out how to create Github repo for your OpenAPI spec.
-  url: 'https://github.com/Rebilly/generator-openapi-repo'
+  description: 
+  version: 2.0.0
+  title: Okidb API  
+  # contact:
+  #   name: API Support
+  #   email: apiteam@swagger.io
+  #   url: https://github.com/Rebilly/ReDoc
+  # x-logo:
+  #   url: 'https://rebilly.github.io/ReDoc/petstore-logo.png'
+  #   altText: Petstore logo
+  # license:
+  #   name: Apache 2.0
+  #   url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
+# externalDocs:
+#   description: Find out how to create Github repo for your OpenAPI spec.
+#   url: 'https://github.com/Rebilly/generator-openapi-repo'
 tags:
+
+  - name: news 
+    description: 新闻-Api
+  - name: thinktanks 
+    description: 智库-Api
   - name: pet
     description: Everything about your Pets
-  - name: store
-    description: Access to Petstore orders
-  - name: user
-    description: Operations about user
-x-tagGroups:
-  - name: General
-    tags:
-      - pet
-      - store
-  - name: User Management
-    tags:
-      - user
+
+#   - name: store
+#     description: Access to Petstore orders
+#   - name: user
+#     description: Operations about user
+# x-tagGroups:
+#   - name: General
+#     tags:
+#       - pet
+#       - store
+#   - name: User Management
+#     tags:
+#       - user
 paths:
+  /v2/dump/task:
+    get:
+      tags:
+        - news
+      summary: Dump-Api
+      # description: Dump-Api
+      parameters:
+        - name: access_token
+          in: query
+          description: 令牌
+          required: true
+          schema: 
+            type: string
+        - name: category
+          in: query
+          description: 数据类别(固定值：news)
+          required: true
+          schema: 
+            type: string
+            enum:
+                - news
+        - name: tagid
+          in: query
+          description: 标签id(只接受单个tagid)
+          required: true
+          schema: 
+            type: string
+            enum:
+                - "252"
+        - name: offset_id
+          in: query
+          description: 翻页参数(偏移量id)
+          required: false
+          schema: 
+            type: string
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/News'
+            # application/xml:
+            #   schema:
+            #     $ref: '#/components/schemas/Order'
+        '400':
+          description: Invalid token supplied
+        '404':
+          description: Page not found
+  /v2/thinktanks/thinktanks:
+    get:
+      tags:
+        - thinktanks
+      summary: List-Api
+      # description:
+      parameters:
+        - name: access_token
+          in: query
+          description: 令牌
+          required: true
+          schema: 
+            type: string
+        - name: tagid
+          in: query
+          description: 标签id
+          required: true
+          schema: 
+            type: string
+            enum:
+                - "252"
+        - name: size
+          in: query
+          description: 每页返回数量(最大值 100)
+          required: false
+          schema: 
+            type: integer
+            maximum: 100
+        - name: offset_id
+          in: query
+          description: 翻页参数(偏移量id)
+          required: false
+          schema: 
+            type: string
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Thinktanks'
+            # application/xml:
+            #   schema:
+            #     $ref: '#/components/schemas/Order'
+        '400':
+          description: Invalid token supplied
+        '404':
+          description: Page not found
   /pet:
     parameters:
       - name: cookieParam
@@ -281,371 +349,592 @@ paths:
             schema:
               type: string
               format: binary
-  /pet/findByStatus:
-    get:
-      tags:
-        - pet
-      summary: Finds Pets by status
-      description: Multiple status values can be provided with comma seperated strings
-      operationId: findPetsByStatus
-      parameters:
-        - name: status
-          in: query
-          description: Status values that need to be considered for filter
-          required: true
-          style: form
-          schema:
-            type: array
-            minItems: 1
-            maxItems: 3
-            items:
-              type: string
-              enum:
-                - available
-                - pending
-                - sold
-              default: available
-      responses:
-        '200':
-          description: successful operation
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Pet'
-            application/xml:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Pet'
-        '400':
-          description: Invalid status value
-      security:
-        - petstore_auth:
-            - 'write:pets'
-            - 'read:pets'
-  /pet/findByTags:
-    get:
-      tags:
-        - pet
-      summary: Finds Pets by tags
-      description: >-
-        Muliple tags can be provided with comma seperated strings. Use tag1,
-        tag2, tag3 for testing.
-      operationId: findPetsByTags
-      deprecated: true
-      parameters:
-        - name: tags
-          in: query
-          description: Tags to filter by
-          required: true
-          style: form
-          schema:
-            type: array
-            items:
-              type: string
-      responses:
-        '200':
-          description: successful operation
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Pet'
-            application/xml:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Pet'
-        '400':
-          description: Invalid tag value
-      security:
-        - petstore_auth:
-            - 'write:pets'
-            - 'read:pets'
-  /store/inventory:
-    get:
-      tags:
-        - store
-      summary: Returns pet inventories by status
-      description: Returns a map of status codes to quantities
-      operationId: getInventory
-      responses:
-        '200':
-          description: successful operation
-          content:
-            application/json:
-              schema:
-                type: object
-                additionalProperties:
-                  type: integer
-                  format: int32
-      security:
-        - api_key: []
-  /store/order:
-    post:
-      tags:
-        - store
-      summary: Place an order for a pet
-      description: ''
-      operationId: placeOrder
-      responses:
-        '200':
-          description: successful operation
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Order'
-            application/xml:
-              schema:
-                $ref: '#/components/schemas/Order'
-        '400':
-          description: Invalid Order
-          content:
-            application/json:
-              example:
-                status: 400
-                message: "Invalid Order"
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/Order'
-        description: order placed for purchasing the pet
-        required: true
-  '/store/order/{orderId}':
-    get:
-      tags:
-        - store
-      summary: Find purchase order by ID
-      description: >-
-        For valid response try integer IDs with value <= 5 or > 10. Other values
-        will generated exceptions
-      operationId: getOrderById
-      parameters:
-        - name: orderId
-          in: path
-          description: ID of pet that needs to be fetched
-          required: true
-          schema:
-            type: integer
-            format: int64
-            minimum: 1
-            maximum: 5
-      responses:
-        '200':
-          description: successful operation
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Order'
-            application/xml:
-              schema:
-                $ref: '#/components/schemas/Order'
-        '400':
-          description: Invalid ID supplied
-        '404':
-          description: Order not found
-    delete:
-      tags:
-        - store
-      summary: Delete purchase order by ID
-      description: >-
-        For valid response try integer IDs with value < 1000. Anything above
-        1000 or nonintegers will generate API errors
-      operationId: deleteOrder
-      parameters:
-        - name: orderId
-          in: path
-          description: ID of the order that needs to be deleted
-          required: true
-          schema:
-            type: string
-            minimum: 1
-      responses:
-        '400':
-          description: Invalid ID supplied
-        '404':
-          description: Order not found
-  /user:
-    post:
-      tags:
-        - user
-      summary: Create user
-      description: This can only be done by the logged in user.
-      operationId: createUser
-      responses:
-        default:
-          description: successful operation
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/User'
-        description: Created user object
-        required: true
-  '/user/{username}':
-    get:
-      tags:
-        - user
-      summary: Get user by user name
-      description: ''
-      operationId: getUserByName
-      parameters:
-        - name: username
-          in: path
-          description: 'The name that needs to be fetched. Use user1 for testing. '
-          required: true
-          schema:
-            type: string
-      responses:
-        '200':
-          description: successful operation
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/User'
-            application/xml:
-              schema:
-                $ref: '#/components/schemas/User'
-        '400':
-          description: Invalid username supplied
-        '404':
-          description: User not found
-    put:
-      tags:
-        - user
-      summary: Updated user
-      description: This can only be done by the logged in user.
-      operationId: updateUser
-      parameters:
-        - name: username
-          in: path
-          description: name that need to be deleted
-          required: true
-          schema:
-            type: string
-      responses:
-        '400':
-          description: Invalid user supplied
-        '404':
-          description: User not found
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/User'
-        description: Updated user object
-        required: true
-    delete:
-      tags:
-        - user
-      summary: Delete user
-      description: This can only be done by the logged in user.
-      operationId: deleteUser
-      parameters:
-        - name: username
-          in: path
-          description: The name that needs to be deleted
-          required: true
-          schema:
-            type: string
-      responses:
-        '400':
-          description: Invalid username supplied
-        '404':
-          description: User not found
-  /user/createWithArray:
-    post:
-      tags:
-        - user
-      summary: Creates list of users with given input array
-      description: ''
-      operationId: createUsersWithArrayInput
-      responses:
-        default:
-          description: successful operation
-      requestBody:
-        $ref: '#/components/requestBodies/UserArray'
-  /user/createWithList:
-    post:
-      tags:
-        - user
-      summary: Creates list of users with given input array
-      description: ''
-      operationId: createUsersWithListInput
-      responses:
-        default:
-          description: successful operation
-      requestBody:
-        $ref: '#/components/requestBodies/UserArray'
-  /user/login:
-    get:
-      tags:
-        - user
-      summary: Logs user into the system
-      description: ''
-      operationId: loginUser
-      parameters:
-        - name: username
-          in: query
-          description: The user name for login
-          required: true
-          schema:
-            type: string
-        - name: password
-          in: query
-          description: The password for login in clear text
-          required: true
-          schema:
-            type: string
-      responses:
-        '200':
-          description: successful operation
-          headers:
-            X-Rate-Limit:
-              description: calls per hour allowed by the user
-              schema:
-                type: integer
-                format: int32
-            X-Expires-After:
-              description: date in UTC when toekn expires
-              schema:
-                type: string
-                format: date-time
-          content:
-            application/json:
-              schema:
-                type: string
-              examples:
-                response:
-                  value: OK
-            application/xml:
-              schema:
-                type: string
-              examples:
-                response:
-                  value:  <Message> OK </Message>
-            text/plain:
-              examples:
-                response:
-                  value:  OK
-        '400':
-          description: Invalid username/password supplied
-  /user/logout:
-    get:
-      tags:
-        - user
-      summary: Logs out current logged in user session
-      description: ''
-      operationId: logoutUser
-      responses:
-        default:
-          description: successful operation
+  # /pet/findByStatus:
+  #   get:
+  #     tags:
+  #       - pet
+  #     summary: Finds Pets by status
+  #     description: Multiple status values can be provided with comma seperated strings
+  #     operationId: findPetsByStatus
+  #     parameters:
+  #       - name: status
+  #         in: query
+  #         description: Status values that need to be considered for filter
+  #         required: true
+  #         style: form
+  #         schema:
+  #           type: array
+  #           minItems: 1
+  #           maxItems: 3
+  #           items:
+  #             type: string
+  #             enum:
+  #               - available
+  #               - pending
+  #               - sold
+  #             default: available
+  #     responses:
+  #       '200':
+  #         description: successful operation
+  #         content:
+  #           application/json:
+  #             schema:
+  #               type: array
+  #               items:
+  #                 $ref: '#/components/schemas/Pet'
+  #           application/xml:
+  #             schema:
+  #               type: array
+  #               items:
+  #                 $ref: '#/components/schemas/Pet'
+  #       '400':
+  #         description: Invalid status value
+  #     security:
+  #       - petstore_auth:
+  #           - 'write:pets'
+  #           - 'read:pets'
+  # /pet/findByTags:
+  #   get:
+  #     tags:
+  #       - pet
+  #     summary: Finds Pets by tags
+  #     description: >-
+  #       Muliple tags can be provided with comma seperated strings. Use tag1,
+  #       tag2, tag3 for testing.
+  #     operationId: findPetsByTags
+  #     deprecated: true
+  #     parameters:
+  #       - name: tags
+  #         in: query
+  #         description: Tags to filter by
+  #         required: true
+  #         style: form
+  #         schema:
+  #           type: array
+  #           items:
+  #             type: string
+  #     responses:
+  #       '200':
+  #         description: successful operation
+  #         content:
+  #           application/json:
+  #             schema:
+  #               type: array
+  #               items:
+  #                 $ref: '#/components/schemas/Pet'
+  #           application/xml:
+  #             schema:
+  #               type: array
+  #               items:
+  #                 $ref: '#/components/schemas/Pet'
+  #       '400':
+  #         description: Invalid tag value
+  #     security:
+  #       - petstore_auth:
+  #           - 'write:pets'
+  #           - 'read:pets'
+  # /store/inventory:
+  #   get:
+  #     tags:
+  #       - store
+  #     summary: Returns pet inventories by status
+  #     description: Returns a map of status codes to quantities
+  #     operationId: getInventory
+  #     responses:
+  #       '200':
+  #         description: successful operation
+  #         content:
+  #           application/json:
+  #             schema:
+  #               type: object
+  #               additionalProperties:
+  #                 type: integer
+  #                 format: int32
+  #     security:
+  #       - api_key: []
+  # /store/order:
+  #   post:
+  #     tags:
+  #       - store
+  #     summary: Place an order for a pet
+  #     description: ''
+  #     operationId: placeOrder
+  #     responses:
+  #       '200':
+  #         description: successful operation
+  #         content:
+  #           application/json:
+  #             schema:
+  #               $ref: '#/components/schemas/Order'
+  #           application/xml:
+  #             schema:
+  #               $ref: '#/components/schemas/Order'
+  #       '400':
+  #         description: Invalid Order
+  #         content:
+  #           application/json:
+  #             example:
+  #               status: 400
+  #               message: "Invalid Order"
+  #     requestBody:
+  #       content:
+  #         application/json:
+  #           schema:
+  #             $ref: '#/components/schemas/Order'
+  #       description: order placed for purchasing the pet
+  #       required: true
+  # '/store/order/{orderId}':
+  #   get:
+  #     tags:
+  #       - store
+  #     summary: Find purchase order by ID
+  #     description: >-
+  #       For valid response try integer IDs with value <= 5 or > 10. Other values
+  #       will generated exceptions
+  #     operationId: getOrderById
+  #     parameters:
+  #       - name: orderId
+  #         in: path
+  #         description: ID of pet that needs to be fetched
+  #         required: true
+  #         schema:
+  #           type: integer
+  #           format: int64
+  #           minimum: 1
+  #           maximum: 5
+  #     responses:
+  #       '200':
+  #         description: successful operation
+  #         content:
+  #           application/json:
+  #             schema:
+  #               $ref: '#/components/schemas/Order'
+  #           application/xml:
+  #             schema:
+  #               $ref: '#/components/schemas/Order'
+  #       '400':
+  #         description: Invalid ID supplied
+  #       '404':
+  #         description: Order not found
+  #   delete:
+  #     tags:
+  #       - store
+  #     summary: Delete purchase order by ID
+  #     description: >-
+  #       For valid response try integer IDs with value < 1000. Anything above
+  #       1000 or nonintegers will generate API errors
+  #     operationId: deleteOrder
+  #     parameters:
+  #       - name: orderId
+  #         in: path
+  #         description: ID of the order that needs to be deleted
+  #         required: true
+  #         schema:
+  #           type: string
+  #           minimum: 1
+  #     responses:
+  #       '400':
+  #         description: Invalid ID supplied
+  #       '404':
+  #         description: Order not found
+  # /user:
+  #   post:
+  #     tags:
+  #       - user
+  #     summary: Create user
+  #     description: This can only be done by the logged in user.
+  #     operationId: createUser
+  #     responses:
+  #       default:
+  #         description: successful operation
+  #     requestBody:
+  #       content:
+  #         application/json:
+  #           schema:
+  #             $ref: '#/components/schemas/User'
+  #       description: Created user object
+  #       required: true
+  # '/user/{username}':
+  #   get:
+  #     tags:
+  #       - user
+  #     summary: Get user by user name
+  #     description: ''
+  #     operationId: getUserByName
+  #     parameters:
+  #       - name: username
+  #         in: path
+  #         description: 'The name that needs to be fetched. Use user1 for testing. '
+  #         required: true
+  #         schema:
+  #           type: string
+  #     responses:
+  #       '200':
+  #         description: successful operation
+  #         content:
+  #           application/json:
+  #             schema:
+  #               $ref: '#/components/schemas/User'
+  #           application/xml:
+  #             schema:
+  #               $ref: '#/components/schemas/User'
+  #       '400':
+  #         description: Invalid username supplied
+  #       '404':
+  #         description: User not found
+  #   put:
+  #     tags:
+  #       - user
+  #     summary: Updated user
+  #     description: This can only be done by the logged in user.
+  #     operationId: updateUser
+  #     parameters:
+  #       - name: username
+  #         in: path
+  #         description: name that need to be deleted
+  #         required: true
+  #         schema:
+  #           type: string
+  #     responses:
+  #       '400':
+  #         description: Invalid user supplied
+  #       '404':
+  #         description: User not found
+  #     requestBody:
+  #       content:
+  #         application/json:
+  #           schema:
+  #             $ref: '#/components/schemas/User'
+  #       description: Updated user object
+  #       required: true
+  #   delete:
+  #     tags:
+  #       - user
+  #     summary: Delete user
+  #     description: This can only be done by the logged in user.
+  #     operationId: deleteUser
+  #     parameters:
+  #       - name: username
+  #         in: path
+  #         description: The name that needs to be deleted
+  #         required: true
+  #         schema:
+  #           type: string
+  #     responses:
+  #       '400':
+  #         description: Invalid username supplied
+  #       '404':
+  #         description: User not found
+  # /user/createWithArray:
+  #   post:
+  #     tags:
+  #       - user
+  #     summary: Creates list of users with given input array
+  #     description: ''
+  #     operationId: createUsersWithArrayInput
+  #     responses:
+  #       default:
+  #         description: successful operation
+  #     requestBody:
+  #       $ref: '#/components/requestBodies/UserArray'
+  # /user/createWithList:
+  #   post:
+  #     tags:
+  #       - user
+  #     summary: Creates list of users with given input array
+  #     description: ''
+  #     operationId: createUsersWithListInput
+  #     responses:
+  #       default:
+  #         description: successful operation
+  #     requestBody:
+  #       $ref: '#/components/requestBodies/UserArray'
+  # /user/login:
+  #   get:
+  #     tags:
+  #       - user
+  #     summary: Logs user into the system
+  #     description: ''
+  #     operationId: loginUser
+  #     parameters:
+  #       - name: username
+  #         in: query
+  #         description: The user name for login
+  #         required: true
+  #         schema:
+  #           type: string
+  #       - name: password
+  #         in: query
+  #         description: The password for login in clear text
+  #         required: true
+  #         schema:
+  #           type: string
+  #     responses:
+  #       '200':
+  #         description: successful operation
+  #         headers:
+  #           X-Rate-Limit:
+  #             description: calls per hour allowed by the user
+  #             schema:
+  #               type: integer
+  #               format: int32
+  #           X-Expires-After:
+  #             description: date in UTC when toekn expires
+  #             schema:
+  #               type: string
+  #               format: date-time
+  #         content:
+  #           application/json:
+  #             schema:
+  #               type: string
+  #             examples:
+  #               response:
+  #                 value: OK
+  #           application/xml:
+  #             schema:
+  #               type: string
+  #             examples:
+  #               response:
+  #                 value:  <Message> OK </Message>
+  #           text/plain:
+  #             examples:
+  #               response:
+  #                 value:  OK
+  #       '400':
+  #         description: Invalid username/password supplied
+  # /user/logout:
+  #   get:
+  #     tags:
+  #       - user
+  #     summary: Logs out current logged in user session
+  #     description: ''
+  #     operationId: logoutUser
+  #     responses:
+  #       default:
+  #         description: successful operation
 components:
   schemas:
+    NewsPartFile:
+      type: object
+      properties:
+        name:
+          description: 文件名
+          type: string
+          example: 5f7415053d5ab4eae7156da7b9073ec7_news_0
+        expire:
+          description: 到期时间
+          type: int64
+          example: 1547805642
+        idx:
+          description: 0
+          type: int32
+          example: 0
+        is_uploaded:
+          description: 是否上传
+          type: boolean
+          example: true
+        size:
+          description: 大小
+          type: int64
+          example: 33665488
+        zip_filename:
+          description: 压缩文件名
+          type: string
+          example: 5f7415053d5ab4eae7156da7b9073ec7_news_0.gz
+        zip_filesize:
+          description: 压缩之后大小
+          type: int64
+          example: 11599435
+        row_count:
+          description: 行数
+          type: int64
+          example: 8600
+        internal_url:
+          description: 内部url
+          type: string
+          example: http://archon2018000000.oss-cn-hangzhou-internal.aliyuncs.com/archon_data%2F5f7415053d5ab4eae7156da7b9073ec7_news_0.gz?Expires=1547805643&OSSAccessKeyId=gZL8z938T19mSUHf&Signature=9EdRkxd0UpSUHUdNBjK6eF0Wkg4%3D
+        external_url:
+          description: 外部url
+          type: string
+          example: http://archon2018000000.oss-cn-hangzhou.aliyuncs.com/archon_data%2F5f7415053d5ab4eae7156da7b9073ec7_news_0.gz?Expires=1547805643&OSSAccessKeyId=gZL8z938T19mSUHf&Signature=9EdRkxd0UpSUHUdNBjK6eF0Wkg4%3D
+    NewsPartFile1:
+      type: object
+      properties:
+        name:
+          description: 文件名
+          type: string
+          example: 5f7415053d5ab4eae7156da7b9073ec7_news_0
+        expire:
+          description: 到期时间
+          type: int64
+          example: 1547805642
+        idx:
+          description: 0
+          type: int32
+          example: 0
+        is_uploaded:
+          description: 是否上传
+          type: boolean
+          example: true
+        size:
+          description: 大小
+          type: int64
+          example: 33665488
+        zip_filename:
+          description: 压缩文件名
+          type: string
+          example: 5f7415053d5ab4eae7156da7b9073ec7_news_0.gz
+        zip_filesize:
+          description: 压缩之后大小
+          type: int64
+          example: 11599435
+        row_count:
+          description: 行数
+          type: int64
+          example: 8600
+        internal_url:
+          description: 内部url
+          type: string
+          example: http://archon2018000000.oss-cn-hangzhou-internal.aliyuncs.com/archon_data%2F5f7415053d5ab4eae7156da7b9073ec7_news_0.gz?Expires=1547805643&OSSAccessKeyId=gZL8z938T19mSUHf&Signature=9EdRkxd0UpSUHUdNBjK6eF0Wkg4%3D
+        external_url:
+          description: 外部url
+          type: string
+          example: http://archon2018000000.oss-cn-hangzhou.aliyuncs.com/archon_data%2F5f7415053d5ab4eae7156da7b9073ec7_news_0.gz?Expires=1547805643&OSSAccessKeyId=gZL8z938T19mSUHf&Signature=9EdRkxd0UpSUHUdNBjK6eF0Wkg4%3D
+    NewsInfos:
+      type: object
+      properties:
+        id:
+          description: 唯一id
+          type: string
+          example: 5f7415053d5ab4eae7156da7b9073ec7
+        status:
+          description: 0(任务等待执行)、1(执行中)、4(执行完毕)、6(任务创建)
+          type: integer
+          example: 4
+        created_at:
+          description: 创建时间
+          type: int64
+          example: 1545213632
+        row_count: 
+          description: 行数
+          type: int64
+          example: 16903
+        table_name: 
+          description: 表名
+          type: string
+          example: news
+        tag_id: 
+          description: 标签id
+          type: integer
+          example: 252
+        offset_id: 
+          description: 偏移量id
+          type: int64
+          example: 3682474
+        current_idx: 
+          description: 当前索引
+          type: integer
+          example: 2
+        split_interval_type:
+          description: 分隔列表
+          type: integer
+          example: 0
+        indices: 
+          description: 索引
+          type: object
+          example: {}
+        # indices:
+        #   allOf:
+        #     - $ref: '#/components/schemas/Infos'
+        part_files:
+          description: 文件
+          type: array
+          items: 
+            $ref: '#/components/schemas/NewsPartFile'
+          maxItems: 50
+    NewsMeta:
+      type: object
+      properties:
+        code:
+          description: 状态码
+          type: integer
+          example: 200
+        infos:
+          allOf:
+            - $ref: '#/components/schemas/NewsInfos'     
+    News:
+      type: object
+      properties:
+        meta:
+          description: 元数据
+          allOf:
+            - $ref: '#/components/schemas/NewsMeta'
+      # xml:
+      #   name: News
+    ThinktanksList:
+      type: object
+      properties:
+        id:
+          description: 新闻唯一id
+          type: string
+          example: 9b8d6940344981db91fdceb0b52db897
+        title:
+          description: 新闻题目
+          type: string
+          example: Sea, air and land updates
+        site:
+          description: 站点名称
+          type: string
+          example: 澳大利亚战略政策研究所
+        desp:
+          description: 新闻内容详情
+          type: text
+          example: "Sea, air and land updates 19 Jan 2016|Alice Slevison, Mercedes Page and James Mugg SHARE Print This Post Sea State Last week, 10 US soldiers were held by Iran’s military after their riverine boat drifted into Iranian waters. In order to complete the journey from Bahrain to Kuwait, the two vessels were required to refuel at a meeting point located three miles west of the 12-mile limit surrounding Iran’s Farsi Island. However, the boats strayed from the approved course and ended up in Iranian territorial waters. It’s believed that at least one of the boats had mechanical problems.The release of the naval officer came after 16 hours of negotiations, with Iran’s Naval Commander, Admiral Ali Fadavi, stating that  ‘this trespassing was not hostile or for spying purposes‘ and that the naval officers had been in Iranian territory ‘due to a broken navigation system’. Last Wednesday, the head of the US Coastguard, Commandant Admiral Paul Zukunft,announced a Federal Business Opportunities solicitation for the Polar Class Icebreaker Replacement Program. A second icebreaker is important to the Coast Guard’s Arctic strategy, with President Obama last year calling for the US to accelerate plans to buy at least one new heavy icebreaker by 2020. Each ship is likely to cost around US$1 billion. Zukunft has said that the US has a long way to catch up with its number one Arctic competitor, Russia, which has 41 icebreakers and another 14 under construction, in contrast to the US which has the Polar Starand the medium icebreaker Healy. Meanwhile, the Philippines has announced its intention to offer the US military use of eight bases, after the country’s Supreme Court upheld a security agreement with Washington. The facilities include the former Clark Airbase and air and naval facilities on the south-west island of Palawan which faces the South China Sea. It’s reported that the Americans are also seeking access to three civilian seaports, including Subic Bay, a former US Navy base. Flight Path Pentagon officials have revealed to Defense One that the US Air Force has given up immediate plans to retire the A-10 Thunderbolt II attack plane. The A-10, affectionately known as the Warthog, is designed to provide close air support and to withstand enemy ground fire. The postponement of the ageing attack plane is said to be due to its critical role in the fight against ISIS in Iraq and Syria. For Warthog novices, Business Insider looks at why US soldiers love the A-10 and how it sparks fear in their enemies, complete with pictures and video footage, which you can check out here. The growing schism between Vietnam and China over the South China Sea looks set to take off into the skies, at least according to an article on The National Interest which looks at Vietnam’s negotiations with American and European manufacturers to purchase a range of new aircraft to replace its ageing Russian-made fleet of fighters. For a different take on the negotiations, Robert Farley at The Diplomat checks out the potential shift in Vietnamese military aviation, and why it matters if the Vietnam People’s Air Force begins flying western fighters. Quick read: Northrop Grumman has laid out their vision for a sixth generation long-range unmanned fighter with advanced cyber resiliency. DefenseNews takes a look. Rapid Fire Robots may soon be raining from the sky, as the US Army begins testing a new robot-assisted parachute system. The aerial guidance unit is designed to allow military cargo-drops into forward operating bases without the use of GPS, instead relying on a camera and custom software to guide the parachute. The desire for a system that doesn’t rely on GPS stems from its limitations, which includes unreliable signal strength in places like the valleys of Afghanistan and the possibility of enemy signal jamming. The US Army has also approved plans to upgrade its Chinook fleet in the 2020s—specifically the CH-47F and MH-47G variants. While the exact upgrade technologies haven’t yet been determined, they will aim to improve the Chinook’s lift capability noticeably. That’s good news for the Australian Defence Force, as the Australian Army operates seven CH-47F Chinooks, with Defence thinking about boosting the fleet by three. The Turkish army will soon have a brand new base in Somalia—Turkey’s first military base in Africa. The base is intended as a training facility for Somali troops, many of whom are engaged in the fight against al-Shabaab militants. The news comes on the heels of an earlier announcement that Turkey will be building a base in Qatar. AUTHOR Alice Slevison, Mercedes Page and James Mugg are research interns at ASPI. Image courtesy of Flickr user Holmes Palacios Jr."
+        author:
+          description: 新闻作者(多个作者之间用逗号隔开)
+          type: string
+          example: Alice Slevison, Mercedes Page and Zoe Hawkins
+        source_url:
+          description: 源链接
+          type: string
+          example: http://www.aspistrategist.org.au/sea-air-and-land-updates-23/
+        country:
+          description: 国家名称
+          type: string
+          example: 澳大利亚
+        file_url:
+          description: 文件url
+          type: string
+          example: http://bhmpub.oss-cn-qingdao.aliyuncs.com/thinktanks/41ca1b9e0f71b5c25f0f9838e86711b7.docx
+    ThinktanksInfos:
+      type: object
+      properties:
+        offset_id:
+          description: 翻页参数(偏移量id)
+          type: integer
+          example: 146
+        lists:
+          description: 列表
+          type: array
+          items:
+            $ref: '#/components/schemas/ThinktanksList'
+    ThinktanksMeta:
+      type: object
+      properties:
+        code:
+          description: 状态码
+          type: integer
+          example: 200
+        infos:
+          allOf:
+            - $ref: '#/components/schemas/ThinktanksInfos'
+    Thinktanks:
+      type: object
+      properties:
+        meta:
+          description: 元数据
+          allOf:
+            - $ref: '#/components/schemas/ThinktanksMeta'
     ApiResponse:
       type: object
       properties:
