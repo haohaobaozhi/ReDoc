@@ -23,12 +23,22 @@ info:
 #   url: 'https://github.com/Rebilly/generator-openapi-repo'
 tags:
 
-  - name: news 
-    description: 新闻-Api
-  - name: thinktanks 
+  - name: NewsTwitterFacebook
+    description: 新闻、推特、脸书Dump-Api
+  - name: Thinktanks 
     description: 智库-Api
-  - name: pet
-    description: Everything about your Pets
+  - name: Twitter
+    description: 推特-Api
+  - name: Facebook
+    description: 脸书-Api
+  - name: Linkedin
+    description: 领英-Aapi
+  - name: Youtube
+    description: 油管-Api
+  - name: Vk
+    description: VK-Api
+  # - name: pet
+  #   description: Everything about your Pets
 
 #   - name: store
 #     description: Access to Petstore orders
@@ -46,8 +56,8 @@ paths:
   /v2/dump/task:
     get:
       tags:
-        - news
-      summary: Dump-Api
+        - NewsTwitterFacebook
+      summary: Dump-Api 
       # description: Dump-Api
       parameters:
         - name: access_token
@@ -58,12 +68,14 @@ paths:
             type: string
         - name: category
           in: query
-          description: 数据类别(固定值：news)
+          description: 数据类别(固定值：news、twitter、facebook_post)
           required: true
           schema: 
             type: string
             enum:
                 - news
+                - twitter
+                - facebook_post
         - name: tagid
           in: query
           description: 标签id(只接受单个tagid)
@@ -71,7 +83,7 @@ paths:
           schema: 
             type: string
             enum:
-                - "252"
+                - "xxx"
         - name: offset_id
           in: query
           description: 翻页参数(偏移量id)
@@ -95,7 +107,7 @@ paths:
   /v2/thinktanks/thinktanks:
     get:
       tags:
-        - thinktanks
+        - Thinktanks
       summary: List-Api
       # description:
       parameters:
@@ -112,7 +124,7 @@ paths:
           schema: 
             type: string
             enum:
-                - "252"
+                - "xxx"
         - name: size
           in: query
           description: 每页返回数量(最大值 100)
@@ -140,578 +152,617 @@ paths:
           description: Invalid token supplied
         '404':
           description: Page not found
-  /pet:
-    parameters:
-      - name: cookieParam
-        in: cookie
-        description: Some cookie
-        required: true
-        schema:
-          type: integer
-          format: int64
-    post:
-      tags:
-        - pet
-      summary: Add a new pet to the store
-      description: Add new pet to the store inventory.
-      operationId: addPet
-      responses:
-        '405':
-          description: Invalid input
-      security:
-        - petstore_auth:
-            - 'write:pets'
-            - 'read:pets'
-      x-code-samples:
-        - lang: 'C#'
-          source: |
-            PetStore.v1.Pet pet = new PetStore.v1.Pet();
-            pet.setApiKey("your api key");
-            pet.petType = PetStore.v1.Pet.TYPE_DOG;
-            pet.name = "Rex";
-            // set other fields
-            PetStoreResponse response = pet.create();
-            if (response.statusCode == HttpStatusCode.Created)
-            {
-              // Successfully created
-            }
-            else
-            {
-              // Something wrong -- check response for errors
-              Console.WriteLine(response.getRawResponse());
-            }
-        - lang: PHP
-          source: |
-            $form = new \PetStore\Entities\Pet();
-            $form->setPetType("Dog");
-            $form->setName("Rex");
-            // set other fields
-            try {
-                $pet = $client->pets()->create($form);
-            } catch (UnprocessableEntityException $e) {
-                var_dump($e->getErrors());
-            }
-      requestBody:
-        $ref: '#/components/requestBodies/Pet'
-    put:
-      tags:
-        - pet
-      summary: Update an existing pet
-      description: ''
-      operationId: updatePet
-      responses:
-        '400':
-          description: Invalid ID supplied
-        '404':
-          description: Pet not found
-        '405':
-          description: Validation exception
-      security:
-        - petstore_auth:
-            - 'write:pets'
-            - 'read:pets'
-      x-code-samples:
-        - lang: PHP
-          source: |
-            $form = new \PetStore\Entities\Pet();
-            $form->setPetId(1);
-            $form->setPetType("Dog");
-            $form->setName("Rex");
-            // set other fields
-            try {
-                $pet = $client->pets()->update($form);
-            } catch (UnprocessableEntityException $e) {
-                var_dump($e->getErrors());
-            }
-      requestBody:
-        $ref: '#/components/requestBodies/Pet'
-  '/pet/{petId}':
+  /v2/twitter/favorites:
     get:
       tags:
-        - pet
-      summary: Find pet by ID
-      description: Returns a single pet
-      operationId: getPetById
+        - Twitter
+      summary: TwitterFavoritesApi
+      # description:
       parameters:
-        - name: petId
-          in: path
-          description: ID of pet to return
+        - name: access_token
+          in: query
+          description: 令牌
           required: true
-          deprecated: true
-          schema:
-            type: integer
-            format: int64
-      responses:
-        '200':
-          description: successful operation
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Pet'
-            application/xml:
-              schema:
-                $ref: '#/components/schemas/Pet'
-        '400':
-          description: Invalid ID supplied
-        '404':
-          description: Pet not found
-      security:
-        - api_key: []
-    post:
-      tags:
-        - pet
-      summary: Updates a pet in the store with form data
-      description: ''
-      operationId: updatePetWithForm
-      parameters:
-        - name: petId
-          in: path
-          description: ID of pet that needs to be updated
-          required: true
-          schema:
-            type: integer
-            format: int64
-      responses:
-        '405':
-          description: Invalid input
-      security:
-        - petstore_auth:
-            - 'write:pets'
-            - 'read:pets'
-      requestBody:
-        content:
-          application/x-www-form-urlencoded:
-            schema:
-              type: object
-              properties:
-                name:
-                  description: Updated name of the pet
-                  type: string
-                status:
-                  description: Updated status of the pet
-                  type: string
-    delete:
-      tags:
-        - pet
-      summary: Deletes a pet
-      description: ''
-      operationId: deletePet
-      parameters:
-        - name: api_key
-          in: header
-          required: false
-          schema:
+          schema: 
             type: string
-          example: "Bearer <TOKEN>"
-        - name: petId
-          in: path
-          description: Pet id to delete
+        - name: user_id
+          in: query
+          description: 用户ID
           required: true
-          schema:
+          schema: 
+            type: string
+            # enum:
+            #     - news
+        - name: size
+          in: query
+          description: 每页返回数量(最大值 100)
+          required: false
+          schema: 
             type: integer
-            format: int64
-      responses:
-        '400':
-          description: Invalid pet value
-      security:
-        - petstore_auth:
-            - 'write:pets'
-            - 'read:pets'
-  '/pet/{petId}/uploadImage':
-    post:
-      tags:
-        - pet
-      summary: uploads an image
-      description: ''
-      operationId: uploadFile
-      parameters:
-        - name: petId
-          in: path
-          description: ID of pet to update
-          required: true
-          schema:
-            type: integer
-            format: int64
+            maximum: 100
+        - name: offset_id
+          in: query
+          description: 翻页参数(偏移量id)
+          required: false
+          schema: 
+            type: string
       responses:
         '200':
           description: successful operation
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ApiResponse'
-      security:
-        - petstore_auth:
-            - 'write:pets'
-            - 'read:pets'
-      requestBody:
-        content:
-          application/octet-stream:
-            schema:
-              type: string
-              format: binary
-  # /pet/findByStatus:
-  #   get:
-  #     tags:
-  #       - pet
-  #     summary: Finds Pets by status
-  #     description: Multiple status values can be provided with comma seperated strings
-  #     operationId: findPetsByStatus
-  #     parameters:
-  #       - name: status
-  #         in: query
-  #         description: Status values that need to be considered for filter
-  #         required: true
-  #         style: form
-  #         schema:
-  #           type: array
-  #           minItems: 1
-  #           maxItems: 3
-  #           items:
-  #             type: string
-  #             enum:
-  #               - available
-  #               - pending
-  #               - sold
-  #             default: available
-  #     responses:
-  #       '200':
-  #         description: successful operation
-  #         content:
-  #           application/json:
-  #             schema:
-  #               type: array
-  #               items:
-  #                 $ref: '#/components/schemas/Pet'
-  #           application/xml:
-  #             schema:
-  #               type: array
-  #               items:
-  #                 $ref: '#/components/schemas/Pet'
-  #       '400':
-  #         description: Invalid status value
-  #     security:
-  #       - petstore_auth:
-  #           - 'write:pets'
-  #           - 'read:pets'
-  # /pet/findByTags:
-  #   get:
-  #     tags:
-  #       - pet
-  #     summary: Finds Pets by tags
-  #     description: >-
-  #       Muliple tags can be provided with comma seperated strings. Use tag1,
-  #       tag2, tag3 for testing.
-  #     operationId: findPetsByTags
-  #     deprecated: true
-  #     parameters:
-  #       - name: tags
-  #         in: query
-  #         description: Tags to filter by
-  #         required: true
-  #         style: form
-  #         schema:
-  #           type: array
-  #           items:
-  #             type: string
-  #     responses:
-  #       '200':
-  #         description: successful operation
-  #         content:
-  #           application/json:
-  #             schema:
-  #               type: array
-  #               items:
-  #                 $ref: '#/components/schemas/Pet'
-  #           application/xml:
-  #             schema:
-  #               type: array
-  #               items:
-  #                 $ref: '#/components/schemas/Pet'
-  #       '400':
-  #         description: Invalid tag value
-  #     security:
-  #       - petstore_auth:
-  #           - 'write:pets'
-  #           - 'read:pets'
-  # /store/inventory:
-  #   get:
-  #     tags:
-  #       - store
-  #     summary: Returns pet inventories by status
-  #     description: Returns a map of status codes to quantities
-  #     operationId: getInventory
-  #     responses:
-  #       '200':
-  #         description: successful operation
-  #         content:
-  #           application/json:
-  #             schema:
-  #               type: object
-  #               additionalProperties:
-  #                 type: integer
-  #                 format: int32
-  #     security:
-  #       - api_key: []
-  # /store/order:
-  #   post:
-  #     tags:
-  #       - store
-  #     summary: Place an order for a pet
-  #     description: ''
-  #     operationId: placeOrder
-  #     responses:
-  #       '200':
-  #         description: successful operation
-  #         content:
-  #           application/json:
-  #             schema:
-  #               $ref: '#/components/schemas/Order'
-  #           application/xml:
-  #             schema:
-  #               $ref: '#/components/schemas/Order'
-  #       '400':
-  #         description: Invalid Order
-  #         content:
-  #           application/json:
-  #             example:
-  #               status: 400
-  #               message: "Invalid Order"
-  #     requestBody:
-  #       content:
-  #         application/json:
-  #           schema:
-  #             $ref: '#/components/schemas/Order'
-  #       description: order placed for purchasing the pet
-  #       required: true
-  # '/store/order/{orderId}':
-  #   get:
-  #     tags:
-  #       - store
-  #     summary: Find purchase order by ID
-  #     description: >-
-  #       For valid response try integer IDs with value <= 5 or > 10. Other values
-  #       will generated exceptions
-  #     operationId: getOrderById
-  #     parameters:
-  #       - name: orderId
-  #         in: path
-  #         description: ID of pet that needs to be fetched
-  #         required: true
-  #         schema:
-  #           type: integer
-  #           format: int64
-  #           minimum: 1
-  #           maximum: 5
-  #     responses:
-  #       '200':
-  #         description: successful operation
-  #         content:
-  #           application/json:
-  #             schema:
-  #               $ref: '#/components/schemas/Order'
-  #           application/xml:
-  #             schema:
-  #               $ref: '#/components/schemas/Order'
-  #       '400':
-  #         description: Invalid ID supplied
-  #       '404':
-  #         description: Order not found
-  #   delete:
-  #     tags:
-  #       - store
-  #     summary: Delete purchase order by ID
-  #     description: >-
-  #       For valid response try integer IDs with value < 1000. Anything above
-  #       1000 or nonintegers will generate API errors
-  #     operationId: deleteOrder
-  #     parameters:
-  #       - name: orderId
-  #         in: path
-  #         description: ID of the order that needs to be deleted
-  #         required: true
-  #         schema:
-  #           type: string
-  #           minimum: 1
-  #     responses:
-  #       '400':
-  #         description: Invalid ID supplied
-  #       '404':
-  #         description: Order not found
-  # /user:
-  #   post:
-  #     tags:
-  #       - user
-  #     summary: Create user
-  #     description: This can only be done by the logged in user.
-  #     operationId: createUser
-  #     responses:
-  #       default:
-  #         description: successful operation
-  #     requestBody:
-  #       content:
-  #         application/json:
-  #           schema:
-  #             $ref: '#/components/schemas/User'
-  #       description: Created user object
-  #       required: true
-  # '/user/{username}':
-  #   get:
-  #     tags:
-  #       - user
-  #     summary: Get user by user name
-  #     description: ''
-  #     operationId: getUserByName
-  #     parameters:
-  #       - name: username
-  #         in: path
-  #         description: 'The name that needs to be fetched. Use user1 for testing. '
-  #         required: true
-  #         schema:
-  #           type: string
-  #     responses:
-  #       '200':
-  #         description: successful operation
-  #         content:
-  #           application/json:
-  #             schema:
-  #               $ref: '#/components/schemas/User'
-  #           application/xml:
-  #             schema:
-  #               $ref: '#/components/schemas/User'
-  #       '400':
-  #         description: Invalid username supplied
-  #       '404':
-  #         description: User not found
-  #   put:
-  #     tags:
-  #       - user
-  #     summary: Updated user
-  #     description: This can only be done by the logged in user.
-  #     operationId: updateUser
-  #     parameters:
-  #       - name: username
-  #         in: path
-  #         description: name that need to be deleted
-  #         required: true
-  #         schema:
-  #           type: string
-  #     responses:
-  #       '400':
-  #         description: Invalid user supplied
-  #       '404':
-  #         description: User not found
-  #     requestBody:
-  #       content:
-  #         application/json:
-  #           schema:
-  #             $ref: '#/components/schemas/User'
-  #       description: Updated user object
-  #       required: true
-  #   delete:
-  #     tags:
-  #       - user
-  #     summary: Delete user
-  #     description: This can only be done by the logged in user.
-  #     operationId: deleteUser
-  #     parameters:
-  #       - name: username
-  #         in: path
-  #         description: The name that needs to be deleted
-  #         required: true
-  #         schema:
-  #           type: string
-  #     responses:
-  #       '400':
-  #         description: Invalid username supplied
-  #       '404':
-  #         description: User not found
-  # /user/createWithArray:
-  #   post:
-  #     tags:
-  #       - user
-  #     summary: Creates list of users with given input array
-  #     description: ''
-  #     operationId: createUsersWithArrayInput
-  #     responses:
-  #       default:
-  #         description: successful operation
-  #     requestBody:
-  #       $ref: '#/components/requestBodies/UserArray'
-  # /user/createWithList:
-  #   post:
-  #     tags:
-  #       - user
-  #     summary: Creates list of users with given input array
-  #     description: ''
-  #     operationId: createUsersWithListInput
-  #     responses:
-  #       default:
-  #         description: successful operation
-  #     requestBody:
-  #       $ref: '#/components/requestBodies/UserArray'
-  # /user/login:
-  #   get:
-  #     tags:
-  #       - user
-  #     summary: Logs user into the system
-  #     description: ''
-  #     operationId: loginUser
-  #     parameters:
-  #       - name: username
-  #         in: query
-  #         description: The user name for login
-  #         required: true
-  #         schema:
-  #           type: string
-  #       - name: password
-  #         in: query
-  #         description: The password for login in clear text
-  #         required: true
-  #         schema:
-  #           type: string
-  #     responses:
-  #       '200':
-  #         description: successful operation
-  #         headers:
-  #           X-Rate-Limit:
-  #             description: calls per hour allowed by the user
-  #             schema:
-  #               type: integer
-  #               format: int32
-  #           X-Expires-After:
-  #             description: date in UTC when toekn expires
-  #             schema:
-  #               type: string
-  #               format: date-time
-  #         content:
-  #           application/json:
-  #             schema:
-  #               type: string
-  #             examples:
-  #               response:
-  #                 value: OK
-  #           application/xml:
-  #             schema:
-  #               type: string
-  #             examples:
-  #               response:
-  #                 value:  <Message> OK </Message>
-  #           text/plain:
-  #             examples:
-  #               response:
-  #                 value:  OK
-  #       '400':
-  #         description: Invalid username/password supplied
-  # /user/logout:
-  #   get:
-  #     tags:
-  #       - user
-  #     summary: Logs out current logged in user session
-  #     description: ''
-  #     operationId: logoutUser
-  #     responses:
-  #       default:
-  #         description: successful operation
+                $ref: '#/components/schemas/TwitterFavorites'
+            # application/xml:
+            #   schema:
+            #     $ref: '#/components/schemas/Order'
+        '400':
+          description: Invalid token supplied
+        '404':
+          description: Page not found
+  /v2/twitter/friends:
+    get:
+      tags:
+        - Twitter
+      summary: TwitterFriendsApi
+      # description:
+      parameters:
+        - name: access_token
+          in: query
+          description: 令牌
+          required: true
+          schema: 
+            type: string
+        - name: user_id
+          in: query
+          description: 用户ID
+          required: true
+          schema: 
+            type: string
+            # enum:
+            #     - news
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TwitterFriends'
+            # application/xml:
+            #   schema:
+            #     $ref: '#/components/schemas/Order'
+        '400':
+          description: Invalid token supplied
+        '404':
+          description: Page not found
+  /v2/twitter/retweet:
+    get:
+      tags:
+        - Twitter
+      summary: TwitterRetweetApi
+      # description:
+      parameters:
+        - name: access_token
+          in: query
+          description: 令牌
+          required: true
+          schema: 
+            type: string
+        - name: tweet_id
+          in: query
+          description: 推特ID
+          required: true
+          schema: 
+            type: string
+            # enum:
+            #     - news
+        - name: size
+          in: query
+          description: 每页返回数量(最大值 100)
+          required: false
+          schema: 
+            type: integer
+            maximum: 100
+        - name: offset_id
+          in: query
+          description: 翻页参数(偏移量id)
+          required: false
+          schema: 
+            type: string
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TwitterRetweet'
+            # application/xml:
+            #   schema:
+            #     $ref: '#/components/schemas/Order'
+        '400':
+          description: Invalid token supplied
+        '404':
+          description: Page not found
+  /v2/twitter/reply:
+    get:
+      tags:
+        - Twitter
+      summary: TwitterReplyApi
+      # description:
+      parameters:
+        - name: access_token
+          in: query
+          description: 令牌
+          required: true
+          schema: 
+            type: string
+        - name: tweet_id
+          in: query
+          description: 推特ID
+          required: true
+          schema: 
+            type: string
+            # enum:
+            #     - news
+        - name: size
+          in: query
+          description: 每页返回数量(最大值 100)
+          required: false
+          schema: 
+            type: integer
+            maximum: 100
+        - name: offset_id
+          in: query
+          description: 翻页参数(偏移量id)
+          required: false
+          schema: 
+            type: string
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TwitterReply'
+            # application/xml:
+            #   schema:
+            #     $ref: '#/components/schemas/Order'
+        '400':
+          description: Invalid token supplied
+        '404':
+          description: Page not found
+  /v2/facebook/comments:
+    get:
+      tags:
+        - Facebook
+      summary: FacebookComments-Api
+      # description:
+      parameters:
+        - name: access_token
+          in: query
+          description: 令牌
+          required: true
+          schema: 
+            type: string
+        - name: tagid
+          in: query
+          description: 标签id(只接受单个tagid)
+          required: true
+          schema: 
+            type: string
+            enum:
+                - "xxx"
+        - name: size
+          in: query
+          description: 每页返回数量(最大值 100)
+          required: false
+          schema: 
+            type: integer
+            maximum: 100
+        - name: offset_id
+          in: query
+          description: 翻页参数(偏移量id)
+          required: false
+          schema: 
+            type: string
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FacebookComments'
+            # application/xml:
+            #   schema:
+            #     $ref: '#/components/schemas/Order'
+        '400':
+          description: Invalid token supplied
+        '404':
+          description: Page not found
+  /v2/linkedin/user:
+    get:
+      tags:
+        - Linkedin
+      summary: LinkedinUser-Api
+      # description:
+      parameters:
+        - name: access_token
+          in: query
+          description: 令牌
+          required: true
+          schema: 
+            type: string
+        - name: tagid
+          in: query
+          description: 标签id(只接受单个tagid)
+          required: true
+          schema: 
+            type: string
+            enum:
+                - "xxx"
+        - name: size
+          in: query
+          description: 每页返回数量(最大值 100)
+          required: false
+          schema: 
+            type: integer
+            maximum: 100
+        - name: offset_id
+          in: query
+          description: 翻页参数(偏移量id)
+          required: false
+          schema: 
+            type: string
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LinkedinUser'
+            # application/xml:
+            #   schema:
+            #     $ref: '#/components/schemas/Order'
+        '400':
+          description: Invalid token supplied
+        '404':
+          description: Page not found
+  /v2/linkedin/company:
+    get:
+      tags:
+        - Linkedin
+      summary: LinkedinCompany-Api
+      # description:
+      parameters:
+        - name: access_token
+          in: query
+          description: 令牌
+          required: true
+          schema: 
+            type: string
+        - name: tagid
+          in: query
+          description: 标签id(只接受单个tagid)
+          required: true
+          schema: 
+            type: string
+            enum:
+                - "xxx"
+        - name: size
+          in: query
+          description: 每页返回数量(最大值 100)
+          required: false
+          schema: 
+            type: integer
+            maximum: 100
+        - name: offset_id
+          in: query
+          description: 翻页参数(偏移量id)
+          required: false
+          schema: 
+            type: string
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LinkedinCompany'
+            # application/xml:
+            #   schema:
+            #     $ref: '#/components/schemas/Order'
+        '400':
+          description: Invalid token supplied
+        '404':
+          description: Page not found
+  /v2/video/comments:
+    get:
+      tags:
+        - Youtube
+      summary: YoutubeVideoComment-Api
+      # description:
+      parameters:
+        - name: access_token
+          in: query
+          description: 令牌
+          required: true
+          schema: 
+            type: string
+        - name: video_id
+          in: query
+          description: videoID
+          required: true
+          schema: 
+            type: string
+            enum:
+                - "xxx"
+        - name: size
+          in: query
+          description: 每页返回数量(最大值 100)
+          required: false
+          schema: 
+            type: integer
+            maximum: 100
+        - name: offset_id
+          in: query
+          description: 翻页参数(偏移量id)
+          required: false
+          schema: 
+            type: string
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/YoutubeVideoComment'
+            # application/xml:
+            #   schema:
+            #     $ref: '#/components/schemas/Order'
+        '400':
+          description: Invalid token supplied
+        '404':
+          description: Page not found
+  /v2/video/videos:
+    get:
+      tags:
+        - Youtube
+      summary: YoutubeVideoVideos-Api
+      # description:
+      parameters:
+        - name: access_token
+          in: query
+          description: 令牌
+          required: true
+          schema: 
+            type: string
+        - name: tagid
+          in: query
+          description: 标签ID(只接受单个tagid)
+          required: true
+          schema: 
+            type: string
+            enum:
+                - "xxx"
+        - name: size
+          in: query
+          description: 每页返回数量(最大值 100)
+          required: false
+          schema: 
+            type: integer
+            maximum: 100
+        - name: offset_id
+          in: query
+          description: 翻页参数(偏移量id)
+          required: false
+          schema: 
+            type: string
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/YoutubeVideoVideos'
+            # application/xml:
+            #   schema:
+            #     $ref: '#/components/schemas/Order'
+        '400':
+          description: Invalid token supplied
+        '404':
+          description: Page not found
+  /v2/video/comments_by_tag:
+    get:
+      tags:
+        - Youtube
+      summary: YoutubeVideoCommentsByTag-Api
+      # description:
+      parameters:
+        - name: access_token
+          in: query
+          description: 令牌
+          required: true
+          schema: 
+            type: string
+        - name: tagid
+          in: query
+          description: 标签ID(只接受单个tagid)
+          required: true
+          schema: 
+            type: string
+            enum:
+                - "xxx"
+        - name: size
+          in: query
+          description: 每页返回数量(最大值 100)
+          required: false
+          schema: 
+            type: integer
+            maximum: 100
+        - name: offset_id
+          in: query
+          description: 翻页参数(偏移量id)
+          required: false
+          schema: 
+            type: string
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/YoutubeVideoCommentsByTag'
+            # application/xml:
+            #   schema:
+            #     $ref: '#/components/schemas/Order'
+        '400':
+          description: Invalid token supplied
+        '404':
+          description: Page not found
+  /v2/vk/pages:
+    get:
+      tags:
+        - Vk
+      summary: VkPage-Api
+      # description:
+      parameters:
+        - name: access_token
+          in: query
+          description: 令牌
+          required: true
+          schema: 
+            type: string
+        - name: tagid
+          in: query
+          description: 标签ID(只接受单个tagid)
+          required: true
+          schema: 
+            type: string
+            enum:
+                - "xxx"
+        - name: size
+          in: query
+          description: 每页返回数量(最大值 100)
+          required: false
+          schema: 
+            type: integer
+            maximum: 100
+        - name: offset_id
+          in: query
+          description: 翻页参数(偏移量id)
+          required: false
+          schema: 
+            type: string
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VkPage'
+            # application/xml:
+            #   schema:
+            #     $ref: '#/components/schemas/Order'
+        '400':
+          description: Invalid token supplied
+        '404':
+          description: Page not found
+  /v2/vk/comments:
+    get:
+      tags:
+        - Vk
+      summary: VkComments-Api
+      # description:
+      parameters:
+        - name: access_token
+          in: query
+          description: 令牌
+          required: true
+          schema: 
+            type: string
+        - name: tagid
+          in: query
+          description: 标签ID(只接受单个tagid)
+          required: true
+          schema: 
+            type: string
+            enum:
+                - "xxx"
+        - name: size
+          in: query
+          description: 每页返回数量(最大值 100)
+          required: false
+          schema: 
+            type: integer
+            maximum: 100
+        - name: offset_id
+          in: query
+          description: 翻页参数(偏移量id)
+          required: false
+          schema: 
+            type: string
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VkComments'
+            # application/xml:
+            #   schema:
+            #     $ref: '#/components/schemas/Order'
+        '400':
+          description: Invalid token supplied
+        '404':
+          description: Page not found
+  /v2/vk/wall_posts:
+    get:
+      tags:
+        - Vk
+      summary: VkWallPosts-Api
+      # description:
+      parameters:
+        - name: access_token
+          in: query
+          description: 令牌
+          required: true
+          schema: 
+            type: string
+        - name: tagid
+          in: query
+          description: 标签ID(只接受单个tagid)
+          required: true
+          schema: 
+            type: string
+            enum:
+                - "xxx"
+        - name: size
+          in: query
+          description: 每页返回数量(最大值 100)
+          required: false
+          schema: 
+            type: integer
+            maximum: 100
+        - name: offset_id
+          in: query
+          description: 翻页参数(偏移量id)
+          required: false
+          schema: 
+            type: string
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VkWallPosts'
+            # application/xml:
+            #   schema:
+            #     $ref: '#/components/schemas/Order'
+        '400':
+          description: Invalid token supplied
+        '404':
+          description: Page not found
 components:
   schemas:
     NewsPartFile:
@@ -723,11 +774,11 @@ components:
           example: 5f7415053d5ab4eae7156da7b9073ec7_news_0
         expire:
           description: 到期时间
-          type: int64
+          type: integer
           example: 1547805642
         idx:
           description: 0
-          type: int32
+          type: integer
           example: 0
         is_uploaded:
           description: 是否上传
@@ -735,7 +786,7 @@ components:
           example: true
         size:
           description: 大小
-          type: int64
+          type: integer
           example: 33665488
         zip_filename:
           description: 压缩文件名
@@ -743,63 +794,20 @@ components:
           example: 5f7415053d5ab4eae7156da7b9073ec7_news_0.gz
         zip_filesize:
           description: 压缩之后大小
-          type: int64
+          type: integer
           example: 11599435
         row_count:
           description: 行数
-          type: int64
+          type: integer
           example: 8600
         internal_url:
           description: 内部url
           type: string
-          example: http://archon2018000000.oss-cn-hangzhou-internal.aliyuncs.com/archon_data%2F5f7415053d5ab4eae7156da7b9073ec7_news_0.gz?Expires=1547805643&OSSAccessKeyId=gZL8z938T19mSUHf&Signature=9EdRkxd0UpSUHUdNBjK6eF0Wkg4%3D
+          example: http://archon2018000000.oss-cn-hangzhou-internal.aliyuncs.com/archon_data%2F5f7415053d5ab4eae7156da7b9073ec7_news_0.gz?Expires=1547805643&OSSAccessKeyId=gZL8z938T19mSUHf&Signature=9EdRkxd0UpSUHUdNBjK6eF0Wkg41%3D
         external_url:
           description: 外部url
           type: string
-          example: http://archon2018000000.oss-cn-hangzhou.aliyuncs.com/archon_data%2F5f7415053d5ab4eae7156da7b9073ec7_news_0.gz?Expires=1547805643&OSSAccessKeyId=gZL8z938T19mSUHf&Signature=9EdRkxd0UpSUHUdNBjK6eF0Wkg4%3D
-    NewsPartFile1:
-      type: object
-      properties:
-        name:
-          description: 文件名
-          type: string
-          example: 5f7415053d5ab4eae7156da7b9073ec7_news_0
-        expire:
-          description: 到期时间
-          type: int64
-          example: 1547805642
-        idx:
-          description: 0
-          type: int32
-          example: 0
-        is_uploaded:
-          description: 是否上传
-          type: boolean
-          example: true
-        size:
-          description: 大小
-          type: int64
-          example: 33665488
-        zip_filename:
-          description: 压缩文件名
-          type: string
-          example: 5f7415053d5ab4eae7156da7b9073ec7_news_0.gz
-        zip_filesize:
-          description: 压缩之后大小
-          type: int64
-          example: 11599435
-        row_count:
-          description: 行数
-          type: int64
-          example: 8600
-        internal_url:
-          description: 内部url
-          type: string
-          example: http://archon2018000000.oss-cn-hangzhou-internal.aliyuncs.com/archon_data%2F5f7415053d5ab4eae7156da7b9073ec7_news_0.gz?Expires=1547805643&OSSAccessKeyId=gZL8z938T19mSUHf&Signature=9EdRkxd0UpSUHUdNBjK6eF0Wkg4%3D
-        external_url:
-          description: 外部url
-          type: string
-          example: http://archon2018000000.oss-cn-hangzhou.aliyuncs.com/archon_data%2F5f7415053d5ab4eae7156da7b9073ec7_news_0.gz?Expires=1547805643&OSSAccessKeyId=gZL8z938T19mSUHf&Signature=9EdRkxd0UpSUHUdNBjK6eF0Wkg4%3D
+          example: http://archon2018000000.oss-cn-hangzhou.aliyuncs.com/archon_data%2F5f7415053d5ab4eae7156da7b9073ec7_news_0.gz?Expires=1547805643&OSSAccessKeyId=gZL8z938T19mSUHf&Signature=9EdRkxd0UpSUHUdNBjK6eF0Wkg41%3D
     NewsInfos:
       type: object
       properties:
@@ -813,11 +821,11 @@ components:
           example: 4
         created_at:
           description: 创建时间
-          type: int64
+          type: integer
           example: 1545213632
         row_count: 
           description: 行数
-          type: int64
+          type: integer
           example: 16903
         table_name: 
           description: 表名
@@ -829,7 +837,7 @@ components:
           example: 252
         offset_id: 
           description: 偏移量id
-          type: int64
+          type: integer
           example: 3682474
         current_idx: 
           description: 当前索引
@@ -860,6 +868,8 @@ components:
           type: integer
           example: 200
         infos:
+          description: 
+          type: object
           allOf:
             - $ref: '#/components/schemas/NewsInfos'     
     News:
@@ -867,45 +877,51 @@ components:
       properties:
         meta:
           description: 元数据
+          type: object
           allOf:
             - $ref: '#/components/schemas/NewsMeta'
       # xml:
       #   name: News
+
     ThinktanksList:
       type: object
       properties:
         id:
-          description: 新闻唯一id
+          description: 唯一标识
           type: string
           example: 9b8d6940344981db91fdceb0b52db897
         title:
-          description: 新闻题目
+          description: 智库报告外文标题
           type: string
           example: Sea, air and land updates
         site:
-          description: 站点名称
+          description: 智库机构名称
           type: string
           example: 澳大利亚战略政策研究所
         desp:
-          description: 新闻内容详情
-          type: text
+          description: 智库报告核心内容摘要
+          type: string
           example: "Sea, air and land updates 19 Jan 2016|Alice Slevison, Mercedes Page and James Mugg SHARE Print This Post Sea State Last week, 10 US soldiers were held by Iran’s military after their riverine boat drifted into Iranian waters. In order to complete the journey from Bahrain to Kuwait, the two vessels were required to refuel at a meeting point located three miles west of the 12-mile limit surrounding Iran’s Farsi Island. However, the boats strayed from the approved course and ended up in Iranian territorial waters. It’s believed that at least one of the boats had mechanical problems.The release of the naval officer came after 16 hours of negotiations, with Iran’s Naval Commander, Admiral Ali Fadavi, stating that  ‘this trespassing was not hostile or for spying purposes‘ and that the naval officers had been in Iranian territory ‘due to a broken navigation system’. Last Wednesday, the head of the US Coastguard, Commandant Admiral Paul Zukunft,announced a Federal Business Opportunities solicitation for the Polar Class Icebreaker Replacement Program. A second icebreaker is important to the Coast Guard’s Arctic strategy, with President Obama last year calling for the US to accelerate plans to buy at least one new heavy icebreaker by 2020. Each ship is likely to cost around US$1 billion. Zukunft has said that the US has a long way to catch up with its number one Arctic competitor, Russia, which has 41 icebreakers and another 14 under construction, in contrast to the US which has the Polar Starand the medium icebreaker Healy. Meanwhile, the Philippines has announced its intention to offer the US military use of eight bases, after the country’s Supreme Court upheld a security agreement with Washington. The facilities include the former Clark Airbase and air and naval facilities on the south-west island of Palawan which faces the South China Sea. It’s reported that the Americans are also seeking access to three civilian seaports, including Subic Bay, a former US Navy base. Flight Path Pentagon officials have revealed to Defense One that the US Air Force has given up immediate plans to retire the A-10 Thunderbolt II attack plane. The A-10, affectionately known as the Warthog, is designed to provide close air support and to withstand enemy ground fire. The postponement of the ageing attack plane is said to be due to its critical role in the fight against ISIS in Iraq and Syria. For Warthog novices, Business Insider looks at why US soldiers love the A-10 and how it sparks fear in their enemies, complete with pictures and video footage, which you can check out here. The growing schism between Vietnam and China over the South China Sea looks set to take off into the skies, at least according to an article on The National Interest which looks at Vietnam’s negotiations with American and European manufacturers to purchase a range of new aircraft to replace its ageing Russian-made fleet of fighters. For a different take on the negotiations, Robert Farley at The Diplomat checks out the potential shift in Vietnamese military aviation, and why it matters if the Vietnam People’s Air Force begins flying western fighters. Quick read: Northrop Grumman has laid out their vision for a sixth generation long-range unmanned fighter with advanced cyber resiliency. DefenseNews takes a look. Rapid Fire Robots may soon be raining from the sky, as the US Army begins testing a new robot-assisted parachute system. The aerial guidance unit is designed to allow military cargo-drops into forward operating bases without the use of GPS, instead relying on a camera and custom software to guide the parachute. The desire for a system that doesn’t rely on GPS stems from its limitations, which includes unreliable signal strength in places like the valleys of Afghanistan and the possibility of enemy signal jamming. The US Army has also approved plans to upgrade its Chinook fleet in the 2020s—specifically the CH-47F and MH-47G variants. While the exact upgrade technologies haven’t yet been determined, they will aim to improve the Chinook’s lift capability noticeably. That’s good news for the Australian Defence Force, as the Australian Army operates seven CH-47F Chinooks, with Defence thinking about boosting the fleet by three. The Turkish army will soon have a brand new base in Somalia—Turkey’s first military base in Africa. The base is intended as a training facility for Somali troops, many of whom are engaged in the fight against al-Shabaab militants. The news comes on the heels of an earlier announcement that Turkey will be building a base in Qatar. AUTHOR Alice Slevison, Mercedes Page and James Mugg are research interns at ASPI. Image courtesy of Flickr user Holmes Palacios Jr."
         author:
-          description: 新闻作者(多个作者之间用逗号隔开)
+          description: 智库报告作者(多个作者之间用逗号隔开)
           type: string
           example: Alice Slevison, Mercedes Page and Zoe Hawkins
         source_url:
-          description: 源链接
+          description: 智库报告网址
           type: string
           example: http://www.aspistrategist.org.au/sea-air-and-land-updates-23/
         country:
-          description: 国家名称
+          description: 智库机构所在国家
           type: string
           example: 澳大利亚
+        created_at:
+          description: 智库报告发布时间(日期)
+          type: integer
+          example: 1444665600
         file_url:
-          description: 文件url
+          description: PDF&Word文件链接
           type: string
-          example: http://bhmpub.oss-cn-qingdao.aliyuncs.com/thinktanks/41ca1b9e0f71b5c25f0f9838e86711b7.docx
+          example: http://bhmpub.oss-cn-qingdao.aliyuncs.com/thinktanks/41ca1b9e0f71b5c25f0f9838e86711b71.docx
     ThinktanksInfos:
       type: object
       properties:
@@ -926,6 +942,8 @@ components:
           type: integer
           example: 200
         infos:
+          description: 
+          type: object
           allOf:
             - $ref: '#/components/schemas/ThinktanksInfos'
     Thinktanks:
@@ -933,8 +951,1703 @@ components:
       properties:
         meta:
           description: 元数据
+          type: object
           allOf:
             - $ref: '#/components/schemas/ThinktanksMeta'
+
+    TwitterFavoritesList:
+      type: object
+      properties:
+        id:
+          description: 唯一id
+          type: integer
+          example: 657526638784172000
+        created_at:
+          description: 创建日期
+          type: integer
+          example: 1530114400
+        updated_up:
+          description: 更新日期
+          type: integer
+          example: 1545291470
+        created_time:
+          description: 创建时间
+          type: integer
+          example: 1445601541
+        title:
+          description: 标题
+          type: string
+          example: "Selfie Time: Sergio Agüero takes selfie with President #XiJinping and UK PM @David_Cameron, Fri. #XiUKVisit https://t.co/hVnSC7vOo6"
+        pos_neg:
+          description: 正负面
+          type: string
+          example: pos
+        pos_neg_score:
+          description: 正负面得分
+          type: float
+          example: 0.8839358446421491
+        view_count:
+          description: 浏览数
+          type: integer
+          example: 0
+        comment_count:
+          description: 评论数
+          type: integer
+          example: 0
+        repost_count:
+          description: 转发数
+          type: integer
+          example: 47
+        like_count:
+          description: 喜欢数
+          type: integer
+          example: 40
+        dislike_count:
+          description: 不喜欢数
+          type: integer
+          example: 0
+        favourite_count:
+          description: 收藏数
+          type: integer
+          example: 0
+        source_url:
+          description: 原始链接
+          type: string
+          example: https//twitter.com/PDChina/status/657526638784172033
+        lang:
+          description: 语言
+          type: string
+          example: en
+        images:
+          description: 图片链接
+          type: string
+          # items: "http://pbs.twimg.com/media/CSAA_kdWcAAR4s8.jpg"
+          example: "[\"http://pbs.twimg.com/media/CSAA_kdWcAAR4s8.jpg\"]"
+        videos:
+          description: 视频链接
+          type: string
+          example: ""
+        links:
+          description: 链接地址
+          type: string
+          example: "[\"一帶一路倡議5週年\",\"人民日報微評\",\"https://bit.ly/2wX6hTz\"]"
+        tags:
+          description: 标签(多个标签放入数组转化为字符串)
+          type: string
+          example:  "[\"XiJinping\",\"XiUKVisit\"]"
+        mentions:
+          description: 提及
+          type: string
+          example: "[\"XiJinping\",\"XiUKVisit\",\"103065157\"]"  
+        user_id:
+          description: 用户ID
+          type: integer
+          example: 303862998
+        retweet_user_id:
+          description: 转推用户ID
+          type: integer
+          example: 0
+        lat:
+          description: 经度
+          type: integer
+          example: 0
+        lng:
+          description: 纬度
+          type: integer
+          example: 0
+        place:
+          description: 地点
+          type: string
+          example: ""
+        is_retweeted:
+          description: 是否转推
+          type: integer
+          example: 0
+        retweeted_status_created_at:
+          description: 转推时间
+          type: integer
+          example: 0
+        retweeted_status_id:
+          description: 转推ID
+          type: integer
+          example: 0
+        retweeted_status_text:
+          description: 转推内容
+          type: string
+          example: ""
+        retweeted_status_repost_count:
+          description: 转推内容的转发数
+          type: integer
+          example: 0
+        retweeted_status_like_count:
+          description: 转推内容的转发数
+          type: integer
+          example: 0
+        retweeted_status_lang:
+          description: 转推语言
+          type: string
+          example: ""
+        client:
+          description: 终端
+          type: string
+          example:  "<a href=\"http://twitter.com\" rel=\"nofollow\">Twitter Web Client</a>"
+        in_reply_to_screen_name:
+          description:  被回复的Tweet screen_name
+          type: string
+          example: ""
+        in_reply_to_status_id:
+          description: 被回复的Tweet ID
+          type: integer
+          example: 0
+        in_reply_to_user_id:
+          description: 被回复的UserID
+          type: integer
+          example: 0
+        retweeted_status_comment_count:
+          description: 转推评论数
+          type: integer
+          example: 
+    TwitterFavoritesInfos:
+      type: object
+      properties:
+        offset_id:
+          description: 翻页参数(偏移量id)
+          type: integer
+          example: 146
+        lists:
+          description: 列表
+          type: array
+          items:
+            $ref: '#/components/schemas/TwitterFavoritesList'
+    TwitterFavoritesMeta:
+      type: object
+      properties:
+        code:
+          description: 状态码
+          type: integer
+          example: 200
+        infos:
+          description: 
+          type: object
+          allOf:
+            - $ref: '#/components/schemas/TwitterFavoritesInfos'
+    TwitterFavorites:
+      type: object
+      properties:
+        meta:
+          description: 元数据
+          type: object
+          allOf:
+            - $ref: '#/components/schemas/TwitterFavoritesMeta'
+
+    TwitterFriendsInfo:
+      type: object
+      properties:
+        id:
+          description: 唯一id
+          type: integer
+          example: 4736071
+        created_at:
+          description: 创建时间
+          type: integer
+          example: 1176633029
+        description: 
+          description: 描述
+          type: string
+          example: "Interaction and print design. Done: Guardian iPhone (2011) & other apps, UK govt digital transformation. Loves art & design, wife & kids. All my own opinion!"
+        location:
+          description: 位置
+          type: string
+          example: London
+        name: 
+          description: 用户姓名
+          type: string
+          example: John-Henry Barac
+        profile_image_url:
+          description: 头像链接
+          type: string
+          example: http://pbs.twimg.com/profile_images/669890063682158593/aUGeW6V3_normal.jpg
+        screen_name:
+          description: screen_name
+          type: string
+          example: johnhenry
+        follower_count: 
+          description: 关注数
+          type: integer
+          example: 1435
+        friend_count: 
+          description: 好友数
+          type: integer
+          example: 1168
+        listed_count:
+          description:
+          type: integer
+          example: 121
+        status_count:
+          description:
+          type: integer
+          example: 5249
+        favourite_count: 
+          description: 收藏数
+          type: integer
+          example: 1919
+        lang: 
+          description: 语言
+          type: string
+          example: en
+        verified: 
+          description:
+          type: integer
+          example: 0
+        time_zone: 
+          description: 时区
+          type: string
+          example: ""
+        email: 
+          description: 邮箱
+          type: string
+          example: ""
+        updated_ts:
+          description: 更新时间
+          type: integer
+          example: 1541566308
+        sites: 
+          description: 个人网站
+          type: string
+          example: http://johnhenrybarac.com
+        screen_name_lower:
+          description: 
+          type: string
+          example: johnhenry
+    TwitterFriendsMeta:
+      type: object
+      properties:
+        code:
+          description: 状态码
+          type: integer
+          example: 200
+        infos:
+          description: 
+          type: object
+          allOf:
+            - $ref: '#/components/schemas/TwitterFriendsInfo'   
+    TwitterFriends:
+      type: object
+      properties:
+        meta:
+          description: 元数据
+          type: object
+          allOf:
+            - $ref: '#/components/schemas/TwitterFriendsMeta'
+
+    TwitterRetweetList:
+      type: object
+      properties:
+        id:
+          description: 唯一id
+          type: integer
+          example: 1072098604599394300
+        created_at:
+          description: 数据入库时间
+          type: integer
+          example: 1544457665
+        updated_up:
+          description: 入库数据更新时间
+          type: integer
+          example: 1545291470
+        created_time:
+          description: 发布时间
+          type: integer
+          example: 1544443200
+        title:
+          description: 标题
+          type: string
+          example: ....which it was not (but even if it was, it is only a CIVIL CASE, like Obama’s - but it was done correctly by a lawyer and there would not even be a fine. Lawyer’s liability if he made a mistake, not me). Cohen just trying to get his sentence reduced. WITCH HUNT!
+        pos_neg:
+          description: 正负面
+          type: string
+          example: pos
+        pos_neg_score:
+          description: 正负面得分
+          type: float
+          example: 0.5774887728073469
+        view_count:
+          description: 浏览数
+          type: integer
+          example: 0
+        comment_count:
+          description: 评论数
+          type: integer
+          example: 0
+        repost_count:
+          description: 转发数
+          type: integer
+          example: 11520
+        like_count:
+          description: 喜欢数
+          type: integer
+          example: 47624
+        dislike_count:
+          description: 不喜欢数
+          type: integer
+          example: 0
+        favourite_count:
+          description: 收藏数
+          type: integer
+          example: 0
+        source_url:
+          description: 原始链接
+          type: string
+          example: https://twitter.com/realDonaldTrump/status/1072098604599394305
+        lang:
+          description: 语言
+          type: string
+          example: en
+        images:
+          description: 图片链接
+          type: string
+          # items: "http://pbs.twimg.com/media/CSAA_kdWcAAR4s8.jpg"
+          example: "[\"http://pbs.twimg.com/media/CSAA_kdWcAAR4s8.jpg\"]"
+        videos:
+          description: 视频链接
+          type: string
+          example: ""
+        links:
+          description: 链接地址
+          type: string
+          example: "[\"一帶一路倡議5週年\",\"人民日報微評\",\"https://bit.ly/2wX6hTz\"]"
+        tags:
+          description: 标签(多个标签放入数组转化为字符串)
+          type: string
+          example:  "[\"XiJinping\",\"XiUKVisit\"]"
+        mentions:
+          description: 提及
+          type: string
+          example: "[\"XiJinping\",\"XiUKVisit\",\"103065157\"]"  
+        user_id:
+          description: 用户ID
+          type: integer
+          example: 25073877
+        retweet_user_id:
+          description: 转推用户ID
+          type: integer
+          example: 0
+        lat:
+          description: 经度
+          type: integer
+          example: 0
+        lng:
+          description: 纬度
+          type: integer
+          example: 0
+        place:
+          description: 地点
+          type: string
+          example: ""
+        is_retweeted:
+          description: 是否转推
+          type: integer
+          example: 0
+        retweeted_status_created_at:
+          description: 转推时间
+          type: integer
+          example: 0
+        retweeted_status_id:
+          description: 转推ID
+          type: integer
+          example: 0
+        retweeted_status_text:
+          description: 转推内容
+          type: string
+          example: ""
+        retweeted_status_repost_count:
+          description: 转推内容的转发数
+          type: integer
+          example: 0
+        retweeted_status_like_count:
+          description: 转推内容的转发数
+          type: integer
+          example: 0
+        retweeted_status_lang:
+          description: 转推语言
+          type: string
+          example: ""
+        client:
+          description: Tweet发布的客户端
+          type: string
+          example:  "<a href=\"http://twitter.com\" rel=\"nofollow\">Twitter Web Client</a>"
+        in_reply_to_screen_name:
+          description:  被回复的Tweet screen_name
+          type: string
+          example: ""
+        in_reply_to_status_id:
+          description: 被回复的Tweet ID
+          type: integer
+          example: 0
+        in_reply_to_user_id:
+          description: 被回复的UserID
+          type: integer
+          example: 0
+        retweeted_status_comment_count:
+          description: 转推评论数
+          type: integer
+          example: 0
+    TwitterRetweetInfos:
+      type: object
+      properties:
+        page_id:
+          description:
+          type: string
+          example: eyJhY2Nlc3NfdG9rZW4iOiIyZmJhNzcyY2VhOGIwM2MzMDk1MzNhYjRmN2MyM2QwMDYzZTY1YmYzNmVkNjY2ZmQ2MThlZDhlYjViZGY1N2UxIiwiY2F0ZWdvcnkiOiJ0d2l0dGVyIiwic3BlY2lhbF90YWdzIjpbIjI1MiJdLCJzaXplIjo1MCwicGFnZV9pZCI6IiIsImNvZGVzIjpbIjExMyIsIjIzMCIsIjIzMiIsIjIzMyIsIjIzNSIsIjIzNiIsIjI0MyIsIjI0NyIsIjI1MiJdLCJzdGFydF9pZCI6Njc1MTk3MzZ9
+        next_start_id: 
+          description: 
+          type: string
+          example: 67519736
+        lists:
+          description:
+          type: array
+          items:
+            $ref: '#/components/schemas/TwitterRetweetList'
+    TwitterRetweetMeta:
+      type: object
+      properties:
+        code:
+          description: 状态码
+          type: integer
+          example: 200
+        infos:
+          description: 
+          type: object
+          allOf:
+            - $ref: '#/components/schemas/TwitterRetweetInfos'   
+    TwitterRetweet:
+      type: object
+      properties:
+        meta:
+          description: 元数据
+          type: object
+          allOf:
+            - $ref: '#/components/schemas/TwitterRetweetMeta'
+    
+    TwitterReplyList:
+      type: object
+      properties:
+        id:
+          description: 唯一id
+          type: integer
+          example: 955279460399534100
+        created_at:
+          description: 数据入库时间
+          type: integer
+          example: 1541350747
+        updated_up:
+          description: 入库数据更新时间
+          type: integer
+          example: 1541350747
+        created_time:
+          description: 发布时间
+          type: integer
+          example: 1516591346
+        title:
+          description: 标题
+          type: string
+          example: "@cgtnrussian Педерах учат чаю их будущего! Это прекрасно"
+        pos_neg:
+          description: 正负面
+          type: string
+          example: pos
+        pos_neg_score:
+          description: 正负面得分
+          type: float
+          example: 0.5774887728073469
+        view_count:
+          description: 浏览数
+          type: integer
+          example: 0
+        comment_count:
+          description: 评论数
+          type: integer
+          example: 0
+        repost_count:
+          description: 转发数
+          type: integer
+          example: 11520
+        like_count:
+          description: 喜欢数
+          type: integer
+          example: 47624
+        dislike_count:
+          description: 不喜欢数
+          type: integer
+          example: 0
+        favourite_count:
+          description: 收藏数
+          type: integer
+          example: 0
+        source_url:
+          description: 原始链接
+          type: string
+          example: https://twitter.com/Ivan511511/status/955279460399534080
+        lang:
+          description: 语言
+          type: string
+          example: ru
+        images:
+          description: 图片链接
+          type: string
+          # items: "http://pbs.twimg.com/media/CSAA_kdWcAAR4s8.jpg"
+          example: "[\"http://pbs.twimg.com/media/CSAA_kdWcAAR4s8.jpg\"]"
+        videos:
+          description: 视频链接
+          type: string
+          example: ""
+        links:
+          description: 链接地址
+          type: string
+          example: "[\"一帶一路倡議5週年\",\"人民日報微評\",\"https://bit.ly/2wX6hTz\"]"
+        tags:
+          description: 标签(多个标签放入数组转化为字符串)
+          type: string
+          example:  "[\"XiJinping\",\"XiUKVisit\"]"
+        mentions:
+          description: 提及
+          type: string
+          example: "[\"785000165350346753\"]"  
+        user_id:
+          description: 用户ID
+          type: integer
+          example: 826460197162012700
+        retweet_user_id:
+          description: 转推用户ID
+          type: integer
+          example: 0
+        lat:
+          description: 经度
+          type: integer
+          example: 0
+        lng:
+          description: 纬度
+          type: integer
+          example: 0
+        place:
+          description: 地点
+          type: string
+          example: ""
+        is_retweeted:
+          description: 是否转推
+          type: integer
+          example: 0
+        retweeted_status_created_at:
+          description: 转推时间
+          type: integer
+          example: 0
+        retweeted_status_id:
+          description: 转推ID
+          type: integer
+          example: 0
+        retweeted_status_text:
+          description: 转推内容
+          type: string
+          example: ""
+        retweeted_status_repost_count:
+          description: 转推内容的转发数
+          type: integer
+          example: 0
+        retweeted_status_like_count:
+          description: 转推内容的转发数
+          type: integer
+          example: 0
+        retweeted_status_lang:
+          description: 转推语言
+          type: string
+          example: ""
+        client:
+          description: 终端
+          type: string
+          example:  "<a href=\"http://twitter.com/download/iphone\" rel=\"nofollow\">Twitter for iPhone</a>"
+        in_reply_to_screen_name:
+          description:  被回复的Tweet screen_name
+          type: string
+          example: cgtnrussian
+        in_reply_to_status_id:
+          description: 被回复的Tweet ID
+          type: integer
+          example: 955047349570580500
+        in_reply_to_user_id:
+          description: 被回复的UserID
+          type: integer
+          example: 785000165350346800
+        retweeted_status_comment_count:
+          description: 转推评论数
+          type: integer
+          example: 0
+    TwitterReplyInfos:
+      type: object
+      properties:
+        offset_id:
+          description: 翻页参数(偏移量id)
+          type: integer
+          example: 955279460399534100
+        lists:
+          description: 列表
+          type: array
+          items:
+            $ref: '#/components/schemas/TwitterReplyList'     
+    TwitterReplyMeta:
+      type: object
+      properties:
+        code:
+          description: 状态码
+          type: integer
+          example: 200
+        infos:
+          description: 
+          type: object
+          allOf:
+            - $ref: '#/components/schemas/TwitterReplyInfos'   
+    TwitterReply:
+      type: object
+      properties:
+        meta:
+          description: 元数据
+          type: object
+          allOf:
+            - $ref: '#/components/schemas/TwitterReplyMeta'
+
+    FacebookCommentsList:
+      type: object
+      properties:
+        id:
+          description: 唯一标识(MD5)
+          type: string
+          example: 882c1b26f8d12ee9a9dff79621f0f612
+        oid:
+          description: 唯一标识
+          type: string
+          example: 1482142331889245_1484158248354320
+        created_time: 
+          description: 创建时间
+          type: integer
+          example: 1545591252
+        created_at:
+          description: 创建日期
+          type: integer
+          example: 1545811281
+        updated_at:
+          description: 更新日期
+          type: integer
+          example: 1545811281
+        title:
+          description: 标题
+          type: string
+          example: Approved Asia Hookup Agency,contact Agent Noor Azah Binti and MD Rosli Bin Awi Via Whatsapp on +60165297455 to Meet Malaysian's and Chinese wealthy Sugar mummy's and Sugar daddy from all walks of life all around China, Singapore, Taiwan, Hong kong and Malaysia who are ready to pay $5000 USD for a wonderful night and a lot more, all it takes to make a lady happy in bed.this is the only opportunity to get rich and make cool cash with one of the richest sugar mummy in China, Singapore, Taiwan, Hong kong and Malaysia and get hook up immediately, We have different sugar mummy of all class who are ready to pay as much as $5000 USD per night. Please Note what they need is sexual satisfaction and they pay for the services, we offer sugar mummy contact Agent Noor Azah Binti and MD Rosli Bin Awi Via Whatsapp only +60 11-2629 9334
+        pos_neg:
+          description: 正负面
+          type: string
+          example: ""
+        pos_neg_score:
+          description: 正负面得分
+          type: float
+          example: 0
+        comment_count:
+          description: 评论数
+          type: integer
+          example: 0
+        repost_count:
+          description: 回复数
+          type: integer
+          example: 0
+        like_count:
+          description: 喜欢数
+          type: integer
+          example: 0
+        source_url:
+          description: 原始链接
+          type: string
+          example: https://www.facebook.com/423670114403144/posts/1482142331889245/?comment_id=1484158248354320
+        images:
+          description: 图片链接
+          type: string
+          example: ""
+        videos:
+          description: 视频链接
+          type: string
+          example: ""
+        links:
+          description: 链接地址
+          type: string
+          example: ""
+        post_id:
+          description: 原文ID
+          type: string
+          example: b3f5d01ca23a6588c4d564750ce5b991
+        post_oid: 
+          description: 原文PostID
+          type: string
+          example: 423670114403144_1482142331889245
+        reaction_count:
+          description: 互动数
+          type: integer
+          example: 0
+        reaction_type:
+          description: 互动类型
+          type: string
+          example: "NONE"
+          enum:
+            - NONE
+            - LIKE
+            - LOVE
+            - WOW
+            - HAHA
+            - SAD
+            - ANGRY 
+            - THANKFUL
+        link_description:
+          description: 分享链接文字内容
+          type: string
+          example: ""
+        user_id:
+          description: 用户ID
+          type: integer
+          example: 100030009432171
+        user_name:
+          description: 用户名
+          type: string
+          example: Liliana Fergal
+        user_sereen_name:
+          description: 用户screen_name
+          type: string
+          example: ""
+    FacebookCommentsInfos:
+      type: object
+      properties: 
+        offset_id: 
+          description: 翻页参数(偏移量id)
+          type: integer
+          example: 480199
+        lists:
+          description: 列表
+          type: array
+          items:
+            $ref: '#/components/schemas/FacebookCommentsList'
+    FacebookCommentsMeta:
+      type: object
+      properties:
+        code: 
+          description: 状态码
+          type: integer
+          example: 200
+        infos:
+          description:
+          type: object
+          allOf:
+            - $ref: '#/components/schemas/FacebookCommentsInfos'
+    FacebookComments:
+      type: object
+      properties:
+        meta: 
+          description: 元数据
+          type: object
+          allOf:
+            - $ref: '#/components/schemas/FacebookCommentsMeta'
+
+    LinkedinUserList:
+      type: object
+      properties:
+        id:
+          description: 用户id
+          type: string
+          example: juan-campos-865a20a4
+        name:
+          description: 用户名
+          type: string
+          example: Juan Campos
+        profile_image:
+          description: 头像链接
+          type: string
+          example: ""
+        connections:
+          description: 好友数
+          type: string
+          example: ""
+        sub_desp:
+          description: 头衔
+          type: string
+          example: ""
+        location:
+          description: 位置
+          type: string
+          example: Phoenix, Arizona Area
+        desp:
+          description: 个人简介
+          type: string
+          example: ""
+        experience:
+          description: 履历信息
+          type: string
+          example: '[{"companyName":{"Type":3,"Raw":"\"Bill Luke Automotive Dealerships\"","Str":"Bill Luke Automotive Dealerships","Num":0,"Index":134},"companyUrl":"company/1416300","locationName":{"Type":3,"Raw":"\"Phoenix, Arizona\"","Str":"Phoenix, Arizona","Num":0,"Index":16},"timePeriod":{"Type":5,"Raw":"{\"startDate\":{\"month\":4,\"year\":2015}}","Str":"","Num":0,"Index":182},"title":{"Type":3,"Raw":"\"Sales Representative\"","Str":"Sales Representative","Num":0,"Index":1073}},{"companyName":{"Type":3,"Raw":"\"Avondale Nissan\"","Str":"Avondale Nissan","Num":0,"Index":100},"companyUrl":"","locationName":{"Type":0,"Raw":"","Str":"","Num":0,"Index":0},"timePeriod":{"Type":5,"Raw":"{\"endDate\":{\"month\":4,\"year\":2015},\"startDate\":{\"month\":1,\"year\":2014}}","Str":"","Num":0,"Index":131},"title":{"Type":3,"Raw":"\"Finance Manager\"","Str":"Finance Manager","Num":0,"Index":211}},{"companyName":{"Type":3,"Raw":"\"Sands Chevrolet\"","Str":"Sands Chevrolet","Num":0,"Index":138},"companyUrl":"company/1445175","locationName":{"Type":3,"Raw":"\"53rd Ave \u0026 Grand Ave\"","Str":"53rd Ave \u0026 Grand Ave","Num":0,"Index":16},"timePeriod":{"Type":5,"Raw":"{\"endDate\":{\"month\":12,\"year\":2013},\"startDate\":{\"month\":2,\"year\":2013}}","Str":"","Num":0,"Index":169},"title":{"Type":3,"Raw":"\"Assistant Manager Sales\"","Str":"Assistant Manager Sales","Num":0,"Index":1078}},{"companyName":{"Type":3,"Raw":"\"Avondale Nissan\"","Str":"Avondale Nissan","Num":0,"Index":133},"companyUrl":"","locationName":{"Type":3,"Raw":"\"99th Ave \u0026 I-10\"","Str":"99th Ave \u0026 I-10","Num":0,"Index":16},"timePeriod":{"Type":5,"Raw":"{\"endDate\":{\"month\":1,\"year\":2013},\"startDate\":{\"month\":6,\"year\":2011}}","Str":"","Num":0,"Index":164},"title":{"Type":3,"Raw":"\"Sales Consultant\"","Str":"Sales Consultant","Num":0,"Index":244}},{"companyName":{"Type":3,"Raw":"\"Earnhardt Auto Centers\"","Str":"Earnhardt Auto Centers","Num":0,"Index":133},"companyUrl":"company/402030","locationName":{"Type":3,"Raw":"\"99th Ave \u0026 I-10\"","Str":"99th Ave \u0026 I-10","Num":0,"Index":16},"timePeriod":{"Type":5,"Raw":"{\"endDate\":{\"month\":6,\"year\":2011},\"startDate\":{\"month\":1,\"year\":2010}}","Str":"","Num":0,"Index":171},"title":{"Type":3,"Raw":"\"Sales Consultant\"","Str":"Sales Consultant","Num":0,"Index":1086}}]'
+        education:
+          description: 教育经历
+          type: string
+          example: '[{"degreeName":{"Type":0,"Raw":"","Str":"","Num":0,"Index":0},"fieldOfStudy":{"Type":0,"Raw":"","Str":"","Num":0,"Index":0},"schoolName":{"Type":3,"Raw":"\"McClintock\"","Str":"McClintock","Num":0,"Index":165},"schoolUrl":"","timePeriod":{"Type":5,"Raw":"{\"endDate\":{\"year\":1996},\"startDate\":{\"year\":1992}}","Str":"","Num":0,"Index":100}}]'
+        skills:
+          description: 技能
+          type: string
+          example: '"{"industryKnowledge":[{"endorsementCount":"13","skillId":"urn:li:fs_skill:(ACoAABY4Xs0BEmMEG5_ovZCE5adAvo3ruemND9w,597630323)","skillName":"Customer Satisfaction"},{"endorsementCount":"11","skillId":"urn:li:fs_skill:(ACoAABY4Xs0BEmMEG5_ovZCE5adAvo3ruemND9w,597630325)","skillName":"Sales Process"},{"endorsementCount":"9","skillId":"urn:li:fs_skill:(ACoAABY4Xs0BEmMEG5_ovZCE5adAvo3ruemND9w,596056226)","skillName":"Sales"},{"endorsementCount":"9","skillId":"urn:li:fs_skill:(ACoAABY4Xs0BEmMEG5_ovZCE5adAvo3ruemND9w,596056231)","skillName":"Sales Management"},{"endorsementCount":"7","skillId":"urn:li:fs_skill:(ACoAABY4Xs0BEmMEG5_ovZCE5adAvo3ruemND9w,596056230)","skillName":"Automotive"},{"endorsementCount":"1","skillId":"urn:li:fs_skill:(ACoAABY4Xs0BEmMEG5_ovZCE5adAvo3ruemND9w,596056224)","skillName":"Research"}],"otherSkills":null,"toolsTechnologies":[{"endorsementCount":"3","skillId":"urn:li:fs_skill:(ACoAABY4Xs0BEmMEG5_ovZCE5adAvo3ruemND9w,596056222)","skillName":"Microsoft Excel"},{"endorsementCount":"1","skillId":"urn:li:fs_skill:(ACoAABY4Xs0BEmMEG5_ovZCE5adAvo3ruemND9w,596056220)","skillName":"Microsoft Office"},{"endorsementCount":"1","skillId":"urn:li:fs_skill:(ACoAABY4Xs0BEmMEG5_ovZCE5adAvo3ruemND9w,596056223)","skillName":"Microsoft Word"},{"endorsementCount":"1","skillId":"urn:li:fs_skill:(ACoAABY4Xs0BEmMEG5_ovZCE5adAvo3ruemND9w,596056225)","skillName":"PowerPoint"},{"endorsementCount":"1","skillId":"urn:li:fs_skill:(ACoAABY4Xs0BEmMEG5_ovZCE5adAvo3ruemND9w,596056229)","skillName":"Photoshop"}]}'
+        contact:
+          description: 个人资料
+          type: string
+          example: '{"birthDate":"","contactString":"{\"entityUrn\":\"urn:li:fs_contactinfo:ACoAABY4Xs0BEmMEG5_ovZCE5adAvo3ruemND9w\",\"twitterHandles\":[]}","entityUrn":"urn:li:fs_profile:ACoAABY4Xs0BEmMEG5_ovZCE5adAvo3ruemND9w","industryName":"Automotive","industryUrn":"urn:li:fs_industry:53","student":"false"}'
+    LinkedinUserInfos:
+      type: object
+      properties: 
+        offset_id: 
+          description: 翻页参数(偏移量id)
+          type: integer
+          example: 480199
+        lists:
+          description: 列表
+          type: array
+          items:
+            $ref: '#/components/schemas/LinkedinUserList'
+    LinkedinUserMeta:
+      type: object
+      properties:
+        code: 
+          description: 状态码
+          type: integer
+          example: 200
+        infos:
+          description:
+          type: object
+          allOf:
+            - $ref: '#/components/schemas/LinkedinUserInfos'
+    LinkedinUser:
+      type: object
+      properties:
+        meta: 
+          description: 元数据
+          type: object
+          allOf:
+            - $ref: '#/components/schemas/LinkedinUserMeta'
+
+    LinkedinCompanyList:
+      type: object
+      properties:
+        id:
+          description: 唯一id
+          type: string
+          example: company:18782285
+        name:
+          description: 公司名称
+          type: string
+          example: Theresa May MP
+        screen_name:
+          description: screen_name
+          type: string
+          example: theresamay-official
+        phone:
+          description: 电话
+          type: string
+          example:
+        staff_count:
+          description: 员工数
+          type: integer
+          example: 0
+        logo:
+          description: logo图片
+          type: string
+          example: https://media.licdn.com/dms/image/C560BAQHhoWbd7px6ZA/company-logo_200_200/0?e=1553731200&v=beta&t=M4LdHvzfska2K3LSMp4DXPg8l7KBxMXkO00eKWwhVzc
+        organization_type:
+          description: 组织类型
+          type: string
+          example: company
+        confirmed_locations:
+          description: 地点
+          type: string
+          example:  "[{\"country\":\"GB\",\"geographicArea\":\"Westminster\",\"city\":\"London\",\"postalCode\":\"SW1H 7AA\",\"description\":\"10 Downing Street\",\"$type\":\"com.linkedin.voyager.organization.OrganizationAddress\",\"headquarter\":true,\"line1\":\"Westminster\"}]"
+        company_industries:
+          description: 组织行业类型
+          type: string
+          example: "[\"107\"]"
+        description:
+          description: 公司简介
+          type: string
+          example: Theresa has served as Member of Parliament for Maidenhead since 1997. She has held several positions within Parliament since 1997. She was a member of the Shadow Cabinet from 1999 to 2010, and from 2002 to 2003 was the first female Chairman of the Conservative Party. In 2010, she was appointed Home Secretary, a position which she held for 6 years before becoming Prime Minister in July 2016. This profile is promoted by The Office of the Prime Minister at 10 Downing Street. 
+        company_page_url:
+          description: 公司主页
+          type: string
+          example: http://www.tmay.co.uk/
+        founded_on:
+          description: 成立日期
+          type: string
+          example:  "{\"year\":1997,\"$type\":\"com.linkedin.common.Date\"}"
+        company_type:
+          description: 公司类型
+          type:
+          example: "{\"localizedName\":\"Government Agency\",\"code\":\"GOVERNMENT_AGENCY\",\"$type\":\"com.linkedin.voyager.organization.CompanyType\"}"
+        url:
+          description: linkedin主页地址
+          type:
+          example: https://www.linkedin.com/company/18782285
+        country:
+          description: 国家
+          type: string
+          example: GB
+        geographic_area:
+          description: 地区
+          type: string
+          example: Westminster
+        city: 
+          description: 城市
+          type: string
+          example: London
+        postal_code:
+          description: 邮政编码
+          type: string
+          example: SW1H 7AA
+    LinkedinCompanyInfos:
+      type: object
+      properties: 
+        offset_id: 
+          description: 翻页参数(偏移量id)
+          type: integer
+          example: 486336
+        lists:
+          description: 列表
+          type: array
+          items:
+            $ref: '#/components/schemas/LinkedinCompanyList'
+    LinkedinCompanyMeta:
+      type: object
+      properties:
+        code: 
+          description: 状态码
+          type: integer
+          example: 200
+        infos:
+          description:
+          type: object
+          allOf:
+            - $ref: '#/components/schemas/LinkedinCompanyInfos'
+    LinkedinCompany:
+      type: object
+      properties:
+        meta: 
+          description: 元数据
+          type: object
+          allOf:
+            - $ref: '#/components/schemas/LinkedinCompanyMeta'
+
+    YoutubeVideoCommentList:
+      type: object
+      properties:
+        id:
+          description: 唯一id(MD5)
+          type: string
+          example: 1a318e3e09e0d8dc72214b9ee76dc9a6
+        oid:
+          description: 唯一id
+          type: string
+          example: Ugyy8PJGOwkZ63DnKgV4AaABAg
+        site:
+          description: 网站名
+          type: string
+          example: youtube
+        site_url:
+          description: 网站域名
+          type: string
+          example: www.youtube.com
+        created_at: 
+          description: 数据库写入时间
+          type: integer
+          example: 1544001617
+        updated_at:
+          description: 数据库更新时间
+          type: string
+          example: 1544001617
+        created_time:
+          description: 评论发布时间
+          type: integer
+          example: 1536360223
+        title: 
+          description: 标题
+          type: string
+          example: Shanghai railway station, beautiful. Lots of people and real good infrastructure, the Chinese are industrious. Their alphabet, language and way of life is cool. Bullet and regular slow trains. Nice bed room, washroom and food. China is beautiful please en
+        desp:
+          description: 评论内容
+          type: string
+          example: Shanghai railway station, beautiful. Lots of people and real good infrastructure, the Chinese are industrious. Their alphabet, language and way of life is cool. Bullet and regular slow trains. Nice bed room, washroom and food. China is beautiful please enjoy. I saw Candice.
+        pos_neg:
+          description: 正负面
+          type: string
+          example: ""
+        pos_neg_score:
+          description: 正负面得分
+          type: float
+          example: 0
+        view_count:
+          description: 观看数
+          type: integer
+          example: 0
+        comment_count:
+          description: 评论数
+          type: integer
+          example: 0 
+        repost_count:
+          description: 转发数
+          type: integer
+          example: 0
+        like_count:
+          description: 喜欢数
+          type: integer
+          example: 1
+        dislike_count:
+          description: 不喜欢数
+          type: integer
+          example: 0
+        favourite_count:
+          description: 收藏数
+          type: integer
+          example: 0
+        source_url:
+          description: 源地址
+          type: string
+          example: https://www.youtube.com/watch?v=Ugyy8PJGOwkZ63DnKgV4AaABAg
+        lang:
+          description: 语言
+          type: string
+          example: ""
+        images:
+          description: 图片链接
+          type: string
+          example: '["xxx","xxx"]'
+        videos: 
+          description: 视频链接
+          type: string
+          example: '["xxx","xxx"]'
+        links:
+          description: 链接地址
+          type: string
+          example: '[]'
+        tags:
+          description: 标签
+          type: string
+          example: '["xxx","xxx"]'
+        mentions:
+          description: 视频提及
+          type: string
+          example: ""
+        user_id:
+          description: 回复用户ID
+          type: string
+          example: http://www.youtube.com/channel/UCCh27Vf8tZlmTAwLYs_e2gw
+        user_type:
+          description: 
+          type: string
+          example: edidiong ekpo
+        user_name:
+          description: 频道名
+          type: string
+          example: edidiong ekpo
+        user_location:
+          description: 用户位置
+          type: string
+          example: ""
+        user_country:
+          description: 用户国家
+          type: string
+          example: ""
+        user_province:
+          description: 用户省份
+          type: string
+          example: ""
+        user_city:
+          description: 用户城市
+          type: string
+          example: ""
+        user_street:
+          description: 用户街道
+          type: string
+          example: ""
+        user_lat:
+          description: 用户经度
+          type: integer
+          example: 0
+        user_lng:
+          description: 用户纬度
+          type: integer
+          example: 0
+        user_lang:
+          description: 用户语言
+          type: string
+          example: ""
+        post_id: 
+          description: 视频ID(MD5)
+          type: string
+          example: e88aa4594b5c68801977c90d70cb45c9
+        post_oid:
+          description: 视频ID
+          type: string
+          example: TfiAbphH1Zo
+        post_source_url: 
+          description: 视频源地址
+          type: string
+          example: ""
+        user_image:
+          description: 用户图像
+          type: string
+          example: ""
+        country:
+          description: 国家
+          type: string
+          example: ""
+    YoutubeVideoCommentInfos:
+      type: object
+      properties: 
+        offset_id: 
+          description: 翻页参数(偏移量id)
+          type: string
+          example: 616b391688aa14d517e622b5ef67765f
+        lists:
+          description: 列表
+          type: array
+          items:
+            $ref: '#/components/schemas/YoutubeVideoCommentList'
+    YoutubeVideoCommentMeta:
+      type: object
+      properties:
+        code: 
+          description: 状态码
+          type: integer
+          example: 200
+        infos:
+          description:
+          type: object
+          allOf:
+            - $ref: '#/components/schemas/YoutubeVideoCommentInfos'
+    YoutubeVideoComment:
+      type: object
+      properties:
+        meta: 
+          description: 元数据
+          type: object
+          allOf:
+            - $ref: '#/components/schemas/YoutubeVideoCommentMeta'
+
+    YoutubeVideoVideosList:
+      type: object
+      properties:
+        id:
+          description: 唯一id(MD5)
+          type: string
+          example: e88aa4594b5c68801977c90d70cb45c9
+        oid:
+          description: 唯一id
+          type: string
+          example: TfiAbphH1Zo
+        site:
+          description: 网站名
+          type: string
+          example: China Matters
+        site_url:
+          description: 网站域名
+          type: string
+          example: ""
+        created_at: 
+          description: 数据库写入时间
+          type: integer
+          example: 1544001641
+        updated_at:
+          description: 数据库更新时间
+          type: string
+          example: 1544001641
+        created_time:
+          description: 评论发布时间
+          type: integer
+          example: 1536320700
+        title: 
+          description: 标题
+          type: string
+          example: Are China's trains better than yours?
+        desp:
+          description: 评论内容
+          type: string
+          example: 'As part of our "How Much Does It Cost In China?" project we sent Woda Maya on a train trip! He went on both the bullet trains in China and the Slow trains in China to find out which train is better and to find out how much it costs to travel on both trains. History of China's Railroads: In the 1950's, the government initiated numerous railway building projects to fill in missing links in the country's rail network. The new government undertook a vigorous railway building campaign. From 1952, when the first railway of the People's Republic, the Chengdu–Chongqing Railway entered operation, to the end of the First Five Year Plan in 1957, 6,100 kilometres (3,790 miles) of railroads were built, accounting for 18% of the national total. The lines completed during this period include the final sections of the Longhai and Xianggui Railways, the Litang–Zhanjiang, Yingtan–Xiamen, Lancun–Yantai and Xiaoshan–Ningbo Railways. These lines, along with the Baoji–Chengdu Railway (completed in 1958) and the 1,900 km Lanzhou–Xinjiang Railway to Urumqi (completed in 1962), extended the national rail network to the Northwest and Southwest, and added connections between the coast and interior. In 1957, passenger trains averaged 34.8 km/h and freight trains averaged 25.2 km/h. China's railways are among the busiest in the world. In 2014, railways in China delivered 2.357 billion passenger trips, generating 1,160.48 billion passenger-kilometres and carried 3.813 billion tonnes of freight, generating 2,753 billion cargo tonne-kilometres. Freight traffic turnover has increased more than five-fold over the period 1980-2013 and passenger traffic turnover has increased more than seven-fold over the same period. Driven by need to increase freight capacity, the railway network has expanded with the country budgeting $130.4 billion for railway investment in 2014, and has a long-term plan to expand the network to 274,000 km (170,000 mi) by 2050.'
+        pos_neg:
+          description: 正负面
+          type: string
+          example: ""
+        pos_neg_score:
+          description: 正负面得分
+          type: float
+          example: 0
+        view_count:
+          description: 观看数
+          type: integer
+          example: 783
+        comment_count:
+          description: 评论数
+          type: integer
+          example: 2
+        repost_count:
+          description: 转发数
+          type: integer
+          example: 0
+        like_count:
+          description: 喜欢数
+          type: integer
+          example: 14
+        dislike_count:
+          description: 不喜欢数
+          type: integer
+          example: 2
+        favourite_count:
+          description: 收藏数
+          type: integer
+          example: 0
+        source_url:
+          description: 源地址
+          type: string
+          example: https://www.youtube.com/watch?v=TfiAbphH1Zo
+        lang:
+          description: 语言
+          type: string
+          example: ""
+        images:
+          description: 图片链接
+          type: string
+          example: '["https://i.ytimg.com/vi/TfiAbphH1Zo/hqdefault.jpg"]'
+        videos: 
+          description: 视频链接
+          type: string
+          example:
+        links:
+          description: 链接地址
+          type: string
+          example:
+        tags:
+          description: 标签
+          type: string
+          example: '["slow trains in china''s","bullet trains in china","bullet train","high speed train in china","high speed train","railroad in china","Traveling by train in china","China train travel","china train speed","china train trip","china train"]'
+        mentions:
+          description: 视频提及
+          type: string
+          example: ""
+        user_id:
+          description: 回复用户ID
+          type: string
+          example: UCFjgwGAVYtThJdn2i8F8AWw
+        user_type:
+          description: 
+          type: string
+          example: edidiong ekpo
+        user_name:
+          description: 频道名
+          type: string
+          example: China Matters
+        user_location:
+          description: 用户位置
+          type: string
+          example: ""
+        user_country:
+          description: 用户国家
+          type: string
+          example: ""
+        user_province:
+          description: 用户省份
+          type: string
+          example: ""
+        user_city:
+          description: 用户城市
+          type: string
+          example: ""
+        user_street:
+          description: 用户街道
+          type: string
+          example: ""
+        user_lat:
+          description: 用户经度
+          type: integer
+          example: 0
+        user_lng:
+          description: 用户纬度
+          type: integer
+          example: 0
+        user_lang:
+          description: 用户语言
+          type: string
+          example: ""
+        user_image:
+          description: 用户图像
+          type: string
+          example: ""
+        country:
+          description: 国家
+          type: string
+          example: ""
+    YoutubeVideoVideosInfos:
+      type: object
+      properties:
+        offset_id:
+          description: 翻页参数(偏移量id)
+          type: integer
+          example: 60100
+        lists:
+          description: 列表
+          type: array
+          items:
+            $ref: '#/components/schemas/YoutubeVideoVideosList'
+    YoutubeVideoVideosMeta:
+      type: object
+      properties:
+        code: 
+          description: 状态码
+          type: integer
+          example: 200
+        infos:
+          description:
+          type: object
+          allOf:
+            - $ref: '#/components/schemas/YoutubeVideoVideosInfos'
+    YoutubeVideoVideos:
+      type: object
+      properties:
+        meta:
+          description: 元数据
+          type: object
+          allOf:
+            - $ref: '#/components/schemas/YoutubeVideoVideosMeta'
+
+    YoutubeVideoCommentsByTagInfos:
+      type: object
+      properties: 
+        offset_id: 
+          description: 翻页参数(偏移量id)
+          type: integer
+          example: 60100
+        lists:
+          description: 列表
+          type: array
+          items:
+            $ref: '#/components/schemas/YoutubeVideoCommentList'
+    YoutubeVideoCommentsByTagMeta:
+      type: object
+      properties:
+        code: 
+          description: 状态码
+          type: integer
+          example: 200
+        infos:
+          description:
+          type: object
+          allOf:
+            - $ref: '#/components/schemas/YoutubeVideoCommentsByTagInfos'
+    YoutubeVideoCommentsByTag:
+      type: object
+      properties:
+        meta:
+          description: 元数据
+          type: object
+          allOf:
+            - $ref: '#/components/schemas/YoutubeVideoCommentsByTagMeta'
+
+    VkPageList:
+      type: object
+      properties:
+        id:
+          description: 唯一id
+          type: integer
+          example: -42692593
+        name:
+          description: 用户名
+          type: string
+          example: China.org.cn
+        screen_name:
+          description: screen_name
+          type: string
+          example: chinaorgcn
+        type: 
+          description: 账号类型
+          type: string
+          example: page
+        activity:
+          description: 
+          type: string
+          example: Internet Media
+        contacts: 
+          description: 联系方式
+          type: string
+          example: '"[{"phone":" 86-10-88828292","email":"russian@china.org.cn"},{"user_id":178254460,"desc":"редактор","email":"wangz@china.org.cn"}]'
+        profile_image_url:
+          description: 头像链接
+          type: string
+          example: https://pp.userapi.com/c824602/v824602692/f7413/sLHs-DTpv-E.jpg?ava=1
+        main_album_id:
+          description: 相册id
+          type: integer
+          example: 162318025
+        description:
+          description: 描述
+          type: string
+          example: China.org.cn - Прекрасный сайт для знакомства с Китаем. На нем вы найдете самые интересные двуязычные новости, Институт Конфуция онлайн, энциклопедию о Китае, прекрасные фотографии, много захватывающего! China.org.cn - один из шести основных государственных информационных серверов. Мы прилагаем все свои усилия, чтобы своевременно предоставлять пользователям полную информацию и считаем своим долгом знакомить с текущей обстановкой в КНР.
+        place:
+          description: 位置
+          type: string
+          example: ""
+        follower_count:
+          description: 关注数
+          type: integer
+          example: 7637
+        album_count:
+          description: 相册数
+          type: integer
+          example: 3
+        video_count:
+          description: 视频数
+          type: integer
+          example: 17
+        audio_count:
+          description: 音频数
+          type: integer
+          example: 1
+        article_count:
+          description: 文章数
+          type: integer
+          example: 1
+        photo_count:
+          description: 照片数
+          type: integer
+          example: 19
+        links:
+          description: 关联信息
+          type: string
+          example: '[{"id":67875335,"url":"https:\/\/vk.com\/chinafood","name":"Китайская,Корейская,Индийская,Азиатская кухня","photo_50":"https:\/\/pp.userapi.com\/c636825\/v636825402\/3d56e\/L3m-l2mLECQ.jpg?ava=1","photo_100":"https:\/\/pp.userapi.com\/c636825\/v636825402\/3d56d\/DU5I9q15pbo.jpg?ava=1"},{"id":57428007,"url":"https:\/\/vk.com\/govorat?","name":"О чём говорят китайцы?","desc":"大众传媒","photo_50":"https:\/\/pp.userapi.com\/c624020\/v624020144\/2ae4a\/8Nh0qWztvc0.jpg?ava=1","photo_100":"https:\/\/pp.userapi.com\/c624020\/v624020144\/2ae49\/u6KhRDYwyIM.jpg?ava=1"},{"id":54072248,"url":"https:\/\/vk.com\/vchae","name":"Правда в чае | Все о бизнесе с Китаем","desc":"大众传媒","photo_50":"https:\/\/pp.userapi.com\/c851028\/v851028287\/53b6a\/srtLKS9gO7I.jpg?ava=1","photo_100":"https:\/\/pp.userapi.com\/c851028\/v851028287\/53b69\/QjiLei-oCTQ.jpg?ava=1"},{"id":51073733,"url":"https:\/\/vk.com\/kitabooki__kitabooki","name":"Kitabooki","desc":"2,730 名成员","photo_50":"https:\/\/pp.userapi.com\/c837735\/v837735398\/b245\/ajN8_jAO9oM.jpg?ava=1","photo_100":"https:\/\/pp.userapi.com\/c837735\/v837735398\/b244\/SO6qW_qXfJY.jpg?ava=1"},{"id":48450335,"url":"https:\/\/vk.com\/sadpandacn","name":"SadPanda.cn - журнал о современном Китае","desc":"6,144 名成员","photo_50":"https:\/\/pp.userapi.com\/c302100\/g27941003\/e_3b9d6421.jpg?ava=1","photo_100":"https:\/\/pp.userapi.com\/c302100\/g27941003\/d_3572783e.jpg?ava=1"},{"id":48444205,"url":"https:\/\/vk.com\/chinachn","name":"中国！！！Китай!!!","photo_50":"https:\/\/pp.userapi.com\/c305204\/g35880659\/e_0bc575f1.jpg?ava=1","photo_100":"https:\/\/pp.userapi.com\/c305204\/g35880659\/d_26639397.jpg?ava=1"},{"id":48317213,"url":"https:\/\/vk.com\/happyhappypanda","name":"Happy Panda. Food & Travel","photo_50":"https:\/\/pp.userapi.com\/c305304\/v305304820\/5023\/wJ23FJQebX4.jpg?ava=1","photo_100":"https:\/\/pp.userapi.com\/c305304\/v305304820\/5022\/jlOVhFE13WU.jpg?ava=1"},{"id":48225762,"url":"https:\/\/vk.com\/knr1949","name":"Китайская Народная Республика: вчера и сегодня!","desc":"1,461 名成员","photo_50":"https:\/\/pp.userapi.com\/c630222\/v630222826\/bbea\/42fqyujcUvI.jpg?ava=1","photo_100":"https:\/\/pp.userapi.com\/c630222\/v630222826\/bbe9\/O23NBYuLKMQ.jpg?ava=1"},{"id":48224936,"url":"https:\/\/vk.com\/zanimkit","name":"Занимательный китайский язык","desc":"2,482 名成员","photo_50":"https:\/\/pp.userapi.com\/c837628\/v837628093\/2b32c\/rC-RSJVhkNI.jpg?ava=1","photo_100":"https:\/\/pp.userapi.com\/c837628\/v837628093\/2b32b\/2c-1m0RNZGs.jpg?ava=1"},{"id":48109249,"url":"https:\/\/vk.com\/bestofchina","name":"Best of China ~ Китай и китайский язык","desc":"10,837 名成员","photo_50":"https:\/\/pp.userapi.com\/c636619\/v636619668\/513f8\/FeJWk1LZyGA.jpg?ava=1","photo_100":"https:\/\/pp.userapi.com\/c636619\/v636619668\/513f7\/6WCtMLPsrYg.jpg?ava=1"},{"id":48109218,"url":"https:\/\/vk.com\/gorodpekin","name":"▬▬▬ Прекрасный Город ПЕКИН ▬▬▬","desc":"5,951 名成员","photo_50":"https:\/\/pp.userapi.com\/c844520\/v844520190\/11631e\/KCMpAwaoLAM.jpg?ava=1","photo_100":"https:\/\/pp.userapi.com\/c844520\/v844520190\/11631d\/vPdp9CK0RQA.jpg?ava=1"},{"id":48109212,"url":"https:\/\/vk.com\/shnetgroup","name":"Shanghai Networking Group - Встречи и Мероприятия","desc":"509 名成员","photo_50":"https:\/\/pp.userapi.com\/c5973\/g27817312\/e_cd3c384e.jpg?ava=1","photo_100":"https:\/\/pp.userapi.com\/c5973\/g27817312\/d_efb0733c.jpg?ava=1"},{"id":48109182,"url":"https:\/\/vk.com\/club119348","name":"Харбин_Harbin_哈尔滨","desc":"3,350 名成员","photo_50":"https:\/\/pp.userapi.com\/c11347\/g119348\/e_4289d227.jpg?ava=1","photo_100":"https:\/\/pp.userapi.com\/c11347\/g119348\/d_e6fc4d1c.jpg?ava=1"},{"id":48109104,"url":"http:\/\/russian.china.org.cn\/","edit_title":1,"name":"Китайский информационный Интернет-центр (КИИЦ)","desc":"russian.china.org.cn","photo_50":"https:\/\/pp.userapi.com\/c313922\/v313922460\/a8ec\/TycsV_uDivg.jpg","photo_100":"https:\/\/pp.userapi.com\/c313922\/v313922460\/a8ed\/CwrCCHzjtS4.jpg"},{"id":48080909,"url":"https:\/\/vk.com\/study_at_hit","name":"哈工大 HIT Харбинский политехнический университет","desc":"888 名成员","photo_50":"https:\/\/pp.userapi.com\/c729\/g829729\/c_126faf2b.jpg?ava=1","photo_100":"https:\/\/pp.userapi.com\/c729\/g829729\/b_63600282.jpg?ava=1"},{"id":47884152,"url":"https:\/\/vk.com\/cn8ru","name":"Ассоциация предпринимателей Китая","desc":"5 399 участников","photo_50":"https:\/\/pp.userapi.com\/LwSCW0EakXo2NETmTHBLskkVr1LoJ7afkC7gqg\/03417a08ol4.jpg?ava=1","photo_100":"https:\/\/pp.userapi.com\/74GGxn-pR5jKQfCUXAzAThKiHmY8Dicp0AT3ZA\/2B6Vdw4VXck.jpg?ava=1"},{"id":47884132,"url":"https:\/\/vk.com\/rusharbin","name":"Русский клуб в Харбине (哈尔滨, Harbin, Харбин)","photo_50":"https:\/\/pp.userapi.com\/c836332\/v836332858\/639c2\/Dx6y2IYRl0Q.jpg?ava=1","photo_100":"https:\/\/pp.userapi.com\/c836332\/v836332858\/639c1\/tyHyDk54R-E.jpg?ava=1"},{"id":47884127,"url":"https:\/\/vk.com\/renminribao_group","name":"Газета \"Жэньминь жибао\" онлайн","desc":"СМИ","photo_50":"https:\/\/pp.userapi.com\/c627830\/v627830878\/294de\/V0iEJwMfgDo.jpg?ava=1","photo_100":"https:\/\/pp.userapi.com\/c627830\/v627830878\/294dd\/TjjT6tyDdvM.jpg?ava=1"},{"id":47884118,"url":"https:\/\/vk.com\/moskvaccc","name":"Китайский Культурный Центр в Москве","desc":"Государственная организация","photo_50":"https:\/\/pp.userapi.com\/c627231\/v627231728\/26c7\/agEEiLFwZI4.jpg?ava=1","photo_100":"https:\/\/pp.userapi.com\/c627231\/v627231728\/26c6\/FHfCbHiukHk.jpg?ava=1"},{"id":47884104,"url":"https:\/\/vk.com\/club808883","name":"============================== РУССКИЙ КЛУБ В ПЕКИНЕ ==============================","photo_50":"https:\/\/pp.userapi.com\/c1237\/g808883\/c_9dbafbd1.jpg?ava=1","photo_100":"https:\/\/pp.userapi.com\/c1237\/g808883\/b_126a3a6d.jpg?ava=1"},{"id":47884087,"url":"https:\/\/vk.com\/duanji","name":"Заметки китаиста 中文短记 Китайский язык 汉语 Китай 中国","photo_50":"https:\/\/pp.userapi.com\/c622721\/v622721075\/33c6e\/Dxevf5XfQMQ.jpg?ava=1","photo_100":"https:\/\/pp.userapi.com\/c622721\/v622721075\/33c6d\/bMmYZPELX7U.jpg?ava=1"},{"id":47884080,"url":"https:\/\/vk.com\/russianculturalcenterinbeijing","name":"Российский культурный центр в Пекине","photo_50":"https:\/\/pp.userapi.com\/c836120\/v836120174\/5ccd8\/ognOsr9p1kw.jpg?ava=1","photo_100":"https:\/\/pp.userapi.com\/c836120\/v836120174\/5ccd7\/DkFs5DBouG4.jpg?ava=1"},{"id":47884061,"url":"https:\/\/vk.com\/russouzbj","name":"北京市俄罗斯学生会 Российский Студенческий Союз в Пекине","photo_50":"https:\/\/pp.userapi.com\/c627917\/v627917085\/322f4\/gFcX1nZBTE4.jpg?ava=1","photo_100":"https:\/\/pp.userapi.com\/c627917\/v627917085\/322f3\/J3OlhW7_DsE.jpg?ava=1"},{"id":47884041,"url":"https:\/\/vk.com\/chinababe","name":"Это Китай, детка!","desc":"СМИ","photo_50":"https:\/\/pp.userapi.com\/c847120\/v847120794\/106a9\/J4JZIDQ2yFQ.jpg?ava=1","photo_100":"https:\/\/pp.userapi.com\/c847120\/v847120794\/106a8\/cre8qpNf6Lo.jpg?ava=1"},{"id":26710717,"url":"https:\/\/vk.com\/chinakitai","name":"Журнал КИТАЙ","desc":"СМИ","photo_50":"https:\/\/pp.userapi.com\/c836528\/v836528088\/35542\/8ZteKBnYBGM.jpg?ava=1","photo_100":"https:\/\/pp.userapi.com\/c836528\/v836528088\/35541\/lBCTh-ssmYg.jpg?ava=1"},{"id":26710708,"url":"https:\/\/vk.com\/xuehanyu","name":"Китайский язык | 学汉语","photo_50":"https:\/\/pp.userapi.com\/c841437\/v841437190\/5aaf9\/XpfrfXpz7Ic.jpg?ava=1","photo_100":"https:\/\/pp.userapi.com\/c841437\/v841437190\/5aaf8\/uoRxlrCqzuE.jpg?ava=1"},{"id":26710703,"url":"https:\/\/vk.com\/public29233152","name":"Международное радио Китая","desc":"СМИ","photo_50":"https:\/\/pp.userapi.com\/c844723\/v844723111\/2f2fc\/vnPpuVoteXQ.jpg?ava=1","photo_100":"https:\/\/pp.userapi.com\/c844723\/v844723111\/2f2fb\/sM72iaBJ2sc.jpg?ava=1"},{"id":26710698,"url":"https:\/\/vk.com\/club38635511","name":"东北网（веб-сайт Партнеры）","desc":"21 участник","photo_50":"https:\/\/pp.userapi.com\/z9SrtUUl6JnSBUKhmlMCna5wEjfuq1NaEglAMA\/jrkZ0LO4KIc.jpg?ava=1","photo_100":"https:\/\/pp.userapi.com\/69NKdEEl2n_k1VdR0uZ17oLKT3IjqqlxfjUuQg\/zw5Iydti0C8.jpg?ava=1"}]'
+    VkPageInfos:
+      type: object
+      properties: 
+        offset_id: 
+          description: 翻页参数(偏移量id)
+          type: integer
+          example: 2
+        lists:
+          description: 列表
+          type: array
+          items:
+            $ref: '#/components/schemas/VkPageList'
+    VkPageMeta:
+      type: object
+      properties:
+        code: 
+          description: 状态码
+          type: integer
+          example: 200
+        infos:
+          description:
+          type: object
+          allOf:
+            - $ref: '#/components/schemas/VkPageInfos'
+    VkPage:
+      type: object
+      properties:
+        meta:
+          description: 元数据
+          type: object
+          allOf:
+            - $ref: '#/components/schemas/VkPageMeta'
+
+    VkCommentsList:
+      type: object
+      properties:
+        id:
+          description: 评论唯一id
+          type: string
+          example: -42692593_14188_14190
+        from_id:
+          description: 评论人唯一id
+          type: integer
+          example: 50542033
+        post_id:
+          description: 原帖id
+          type: integer
+          example: 14188
+        owner_id:
+          description: 原帖作者id
+          type: integer
+          string: -42692593
+        parents_stack:
+          description:
+          type: string
+          example: '[]'
+        attachments:
+          description: 附件资源 图片 视频 等
+          type: string
+          example: ""
+        created_time:
+          description: 发布时间
+          type: integer
+          example: 1545290120
+        desp: 
+          description: 评论内容
+          type: string
+          example: Домашняя лапша. 😊👍
+        thread:
+          description: 评论回复内容
+          type: string
+          example: '{"count":0,"items":[],"can_post":true,"show_reply_button":true,"groups_can_post":true}'
+    VkCommentsInfos:
+      type: object
+      properties: 
+        offset_id: 
+          description: 翻页参数(偏移量id)
+          type: integer
+          example: 143
+        lists:
+          description: 列表
+          type: array
+          items:
+            $ref: '#/components/schemas/VkCommentsList'
+    VkCommentsMeta:
+      type: object
+      properties:
+        code: 
+          description: 状态码
+          type: integer
+          example: 200
+        infos:
+          description:
+          type: object
+          allOf:
+            - $ref: '#/components/schemas/VkCommentsInfos'
+    VkComments:
+      type: object
+      properties:
+        meta:
+          description: 元数据
+          type: object
+          allOf:
+            - $ref: '#/components/schemas/VkCommentsMeta'
+
+    VkWallPostsList:
+      type: object
+      properties:
+        id:
+          description: 唯一id(MD5)
+          type: string
+          example: -42692593_14148
+        post_id:
+          description: 原始Post id
+          type: integer
+          example: 14188
+        user_id:
+          description: 用户id
+          type: integer
+          string: -42692593
+        reply_owner_id:
+          description: 评论作者id
+          type: integer
+          example: 0
+        reply_post_id:
+          description:
+          type: integer
+          example: 0
+        geo:
+          description: 发布地点
+          type: string
+          example: ""
+        screen_name:
+          description:
+          type: string
+          example: chinaorgcn
+        created_time:
+          description: 发布时间
+          type: integer
+          example: 1544082105
+        post_type: 
+          description: 消息类型
+          type: string
+          example: post
+        title: 
+          description: 发布内容
+          type: string
+          example: «2-й фестиваль туризма и культуры Тофу» пройдет с 8 по 9 декабря в микрорайоне Чибучан города Куньмин (пр. Юньнань). 2 дня, более 500 столов, больших уличных банкетов. Каждые смогут попробовать резко пахнущий тофу, тофу на пару, холодный тофу и другие блюда с многовековой рецептурой. Хотите попробовать?!
+        signer_id:
+          description: 作者id（如果文章已经以社区名称发布并有作者签名）
+          type: integer
+          example: 0
+        source_post:
+          description: 被转发post信息
+          type: string
+          example: ""
+        attachments: 
+          description: 附件资源 图片 视频 等
+          type: string
+          example: '[{"type":"photo","photo":{"id":456247132,"album_id":-7,"owner_id":-42692593,"user_id":100,"photo_75":"https:\/\/pp.userapi.com\/c846416\/v846416063\/14ce45\/S2f36ImZzjA.jpg","photo_130":"https:\/\/pp.userapi.com\/c846416\/v846416063\/14ce46\/kWQp7WoXzlg.jpg","photo_604":"https:\/\/pp.userapi.com\/c846416\/v846416063\/14ce47\/FScOsljFaaU.jpg","photo_807":"https:\/\/pp.userapi.com\/c846416\/v846416063\/14ce48\/IvAx8OiPBK8.jpg","width":640,"height":435,"text":"","date":1544082105,"access_key":"0413a4b1c62209cead"}},{"type":"photo","photo":{"id":456247133,"album_id":-7,"owner_id":-42692593,"user_id":100,"photo_75":"https:\/\/pp.userapi.com\/c846416\/v846416063\/14ce4d\/hV6h9dM5ZtU.jpg","photo_130":"https:\/\/pp.userapi.com\/c846416\/v846416063\/14ce4e\/cyZ5kU-9Xck.jpg","photo_604":"https:\/\/pp.userapi.com\/c846416\/v846416063\/14ce4f\/ZXgiOEy_YsY.jpg","photo_807":"https:\/\/pp.userapi.com\/c846416\/v846416063\/14ce50\/QqgXS--JjZc.jpg","width":480,"height":640,"text":"","date":1544082105,"access_key":"d8f93d5613910f300e"}},{"type":"photo","photo":{"id":456247134,"album_id":-7,"owner_id":-42692593,"user_id":100,"photo_75":"https:\/\/pp.userapi.com\/c846416\/v846416063\/14ce55\/Kgj-9qPZXzw.jpg","photo_130":"https:\/\/pp.userapi.com\/c846416\/v846416063\/14ce56\/q5suf-ekgME.jpg","photo_604":"https:\/\/pp.userapi.com\/c846416\/v846416063\/14ce57\/5QWKpldOqOA.jpg","photo_807":"https:\/\/pp.userapi.com\/c846416\/v846416063\/14ce58\/BUHZKbGgJYM.jpg","width":427,"height":640,"text":"","date":1544082105,"access_key":"5219bcdac13e169f4d"}},{"type":"photo","photo":{"id":456247135,"album_id":-7,"owner_id":-42692593,"user_id":100,"photo_75":"https:\/\/pp.userapi.com\/c846416\/v846416063\/14ce5d\/ztOu-b9G48c.jpg","photo_130":"https:\/\/pp.userapi.com\/c846416\/v846416063\/14ce5e\/0FWUM-CElG4.jpg","photo_604":"https:\/\/pp.userapi.com\/c846416\/v846416063\/14ce5f\/DFudQRPWKZM.jpg","photo_807":"https:\/\/pp.userapi.com\/c846416\/v846416063\/14ce60\/hnClUo5RMA0.jpg","width":640,"height":443,"text":"","date":1544082105,"access_key":"38d956c373693e737f"}},{"type":"photo","photo":{"id":456247136,"album_id":-7,"owner_id":-42692593,"user_id":100,"photo_75":"https:\/\/pp.userapi.com\/c846416\/v846416063\/14ce65\/Ay9BtyrXAGk.jpg","photo_130":"https:\/\/pp.userapi.com\/c846416\/v846416063\/14ce66\/rtK7Zh_Ko8o.jpg","photo_604":"https:\/\/pp.userapi.com\/c846416\/v846416063\/14ce67\/hTIaOHFatHs.jpg","photo_807":"https:\/\/pp.userapi.com\/c846416\/v846416063\/14ce68\/E-lLvZ-UdcQ.jpg","width":640,"height":438,"text":"","date":1544082105,"access_key":"9a4d7537ddad8e1f9a"}}]' 
+        post_source_type:
+          description: 发布源
+          type: string
+          example: vk
+        post_source_platform:
+          description: 发布终端
+          type: string
+          example: ""
+        post_source_url:
+          description: 发布源链接
+          type: string
+          example: ""
+        source_url:
+          description: 源地址
+          type: string
+          example: https://vk.com/chinaorgcn?w=wall-42692593_14148
+        comment_count:
+          description: 评论数
+          type: integer
+          example: 0
+        repost_count:
+          description: 转发数
+          type: integer
+          example: 0
+        like_count:
+          description: 喜欢数
+          type: integer
+          example: 3
+        view_count:
+          description: 浏览数
+          type: integer
+          example: 0 
+    VkWallPostsInfos:
+      type: object
+      properties: 
+        offset_id: 
+          description: 翻页参数(偏移量id)
+          type: integer
+          example: 300
+        lists:
+          description: 列表
+          type: array
+          items:
+            $ref: '#/components/schemas/VkWallPostsList'
+    VkWallPostsMeta:
+      type: object
+      properties:
+        code: 
+          description: 状态码
+          type: integer
+          example: 200
+        infos:
+          description:
+          type: object
+          allOf:
+            - $ref: '#/components/schemas/VkWallPostsInfos'
+    VkWallPosts:
+      type: object
+      properties:
+        meta:
+          description: 元数据
+          type: object
+          allOf:
+            - $ref: '#/components/schemas/VkWallPostsMeta'
+
     ApiResponse:
       type: object
       properties:
@@ -1196,7 +2909,7 @@ components:
               $ref: '#/components/schemas/User'
       description: List of user object
       required: true
-  securitySchemes:
+  # securitySchemes:
     petstore_auth:
       description: |
         Get access to data while protecting your account credentials.

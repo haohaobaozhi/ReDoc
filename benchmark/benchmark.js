@@ -75,7 +75,7 @@ async function runPuppeteer() {
           console.log(obj);
         }
       });
-      await page.goto('http://127.0.0.1:9090', { timeout: 0 });
+      await page.goto('http://127.0.0.1:9098', { timeout: 0 });
       const res = await prom;
       await browser.close();
       return res;
